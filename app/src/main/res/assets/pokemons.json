@@ -1,0 +1,6 @@
+[
+  {"name":"Bulbizarre", "image":"p1", "type1":"plante", "type2":"poison"},
+  {"name":"Herbizarre", "image":"p2", "type1":"plante", "type2":"poison"},
+  {"name":"Florizarre", "image":"p3", "type1":"plante", "type2":"poison"},
+  {"name":"Salamèche", "image":"p4", "type1":"feu"}
+]
