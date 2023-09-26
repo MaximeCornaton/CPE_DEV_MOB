@@ -2,7 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-    <data/>
+    <data>
+        <variable
+            name="pokemonViewModel"
+            type="fr.pokemongeo.gr1.PokemonViewModel" />
+    </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="#FF00FF"
         android:layout_margin="5dp"
@@ -12,7 +16,7 @@
             android:id="@+id/front"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-        android:src="@drawable/p3"
+            android:src="@{pokemonViewModel.getImage(context,pokemonViewModel.front)}"
         app:layout_constraintBottom_toTopOf="@id/separator"
         android:scaleType="centerInside"
         app:layout_constraintEnd_toStartOf="@id/name"
@@ -21,6 +25,7 @@
         <TextView
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:id="@+id/name"
+            android:text="@{pokemonViewModel.name}"
             app:layout_constraintStart_toEndOf="@id/front"
             app:layout_constraintEnd_toStartOf="@id/number"
             app:layout_constraintTop_toTopOf="parent"
