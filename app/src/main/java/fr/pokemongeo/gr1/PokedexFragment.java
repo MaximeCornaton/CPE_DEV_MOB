@@ -11,6 +11,13 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +32,48 @@ public class PokedexFragment extends Fragment {
         PokedexFragmentBinding binding = DataBindingUtil.inflate(inflater,
                 R.layout.pokedex_fragment,container,false);
         List<Pokemon> pokemonList = new ArrayList<>();
-        pokemonList.add(new Pokemon());
-        pokemonList.add(new Pokemon());
+
+        // Ouverture du fichier dans assets
+        InputStreamReader isr;
+        try {
+            isr = new InputStreamReader(getResources().getAssets().open("pokemons.json"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        BufferedReader reader = new BufferedReader(isr);
+        StringBuilder builder = new StringBuilder();
+        String data = "";
+        //lecture du fichier. data == null => EOF
+        while(data != null) {
+            try {
+                data = reader.readLine();
+                builder.append(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //Traitement du fichier
+        try {
+            JSONArray array = new JSONArray(builder.toString());
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                String name = object.getString("name");
+                String image = object.getString("image");
+                int imageId = getResources().getIdentifier(image,"drawable",
+                        binding.getRoot().getContext().getPackageName());
+                String type1String = object.getString("type1");
+                POKEMON_TYPE type1 = POKEMON_TYPE.valueOf(type1String);
+                POKEMON_TYPE type2 = null;
+                if (object.has("type2")) {
+                    String type2String = object.getString("type2");
+                    type2 = POKEMON_TYPE.valueOf(type2String);
+                }
+                pokemonList.add(new Pokemon(i+1,name,imageId,type1,type2));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
         // Création de l'adapter pour la liste
         PokemonListAdapter adapter = new PokemonListAdapter(pokemonList);
