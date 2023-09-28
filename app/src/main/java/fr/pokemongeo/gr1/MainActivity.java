@@ -9,8 +9,18 @@ import android.os.Bundle;
 
 import fr.pokemongeo.gr1.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnClickOnNoteListener {
     private ActivityMainBinding binding;
+    OnClickOnNoteListener listener = new OnClickOnNoteListener(){
+        @Override
+        public void onClickOnNote(int noteId){
+            showNoteDetail(noteId);
+        }
+    };
+
+    private void showNoteDetail(long noteId) {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,5 +34,23 @@ public class MainActivity extends AppCompatActivity {
         PokedexFragment fragment = new PokedexFragment();
         transaction.replace(R.id.fragment_container,fragment);
         transaction.commit();
+        fragment.setOnClickOnNoteListener(listener);
+    }
+
+    @Override
+    public void onClickOnNote(int pokemonId) {
+        // Créez un bundle pour transmettre l'ID du Pokémon sélectionné au nouveau fragment.
+        Bundle bundle = new Bundle();
+        bundle.putInt("pokemonId", pokemonId);
+
+        // Créez une instance du fragment de détails du Pokémon.
+        PokemonDetailFragment detailFragment = new PokemonDetailFragment();
+        detailFragment.setArguments(bundle);
+
+        // Remplacez le fragment actuel par le fragment de détails du Pokémon.
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, detailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

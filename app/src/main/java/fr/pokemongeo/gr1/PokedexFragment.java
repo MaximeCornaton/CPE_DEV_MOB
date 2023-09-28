@@ -24,6 +24,17 @@ import java.util.List;
 import fr.pokemongeo.gr1.databinding.PokedexFragmentBinding;
 
 public class PokedexFragment extends Fragment {
+    private OnClickOnNoteListener listener;
+    public void setOnClickOnNoteListener(OnClickOnNoteListener listener)
+    {
+        this.listener = listener;
+    }
+
+    public void onEventFunction(int pokemonId) {
+        if (listener != null)
+            listener.onClickOnNote(pokemonId);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
