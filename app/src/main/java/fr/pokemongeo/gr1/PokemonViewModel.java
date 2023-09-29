@@ -42,4 +42,14 @@ public class PokemonViewModel extends BaseObservable {
         else
             return null;
     }
+
+    public Drawable getTypeImage(Context context, String type) {
+        if(type != null) {
+            int typeResourceId = context.getResources().getIdentifier(type.toLowerCase(), "drawable", context.getPackageName());
+            if (typeResourceId != 0) {
+                return ResourcesCompat.getDrawable(context.getResources(), typeResourceId, context.getTheme());
+            }
+        }
+        return null;
+    }
 }

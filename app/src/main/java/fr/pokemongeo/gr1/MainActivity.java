@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity implements OnClickOnNoteList
         }
     };
 
-    private void showNoteDetail(long noteId) {
+    private void showNoteDetail(int noteId) {
     }
 
     @Override
