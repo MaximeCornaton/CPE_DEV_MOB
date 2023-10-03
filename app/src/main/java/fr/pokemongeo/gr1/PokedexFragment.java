@@ -25,14 +25,15 @@ import fr.pokemongeo.gr1.databinding.PokedexFragmentBinding;
 
 public class PokedexFragment extends Fragment {
     private OnClickOnNoteListener listener;
+
     public void setOnClickOnNoteListener(OnClickOnNoteListener listener)
     {
         this.listener = listener;
     }
 
-    public void onEventFunction(int pokemonId) {
+    public void onEventFunction(Pokemon pokemon) {
         if (listener != null)
-            listener.onClickOnNote(pokemonId);
+            listener.onClickOnNote(pokemon);
     }
 
     @Nullable
@@ -87,7 +88,7 @@ public class PokedexFragment extends Fragment {
 
 
         // Création de l'adapter pour la liste
-        PokemonListAdapter adapter = new PokemonListAdapter(pokemonList);
+        PokemonListAdapter adapter = new PokemonListAdapter(pokemonList, listener);
 
         // Définition de l'adapter sur le RecyclerView
         binding.pokemonList.setAdapter(adapter);

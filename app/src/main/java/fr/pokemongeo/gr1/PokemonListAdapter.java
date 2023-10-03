@@ -1,6 +1,8 @@
 package fr.pokemongeo.gr1;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -13,9 +15,11 @@ import fr.pokemongeo.gr1.databinding.PokemonItemBinding;
 
 public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.ViewHolder> {
     List<Pokemon> pokemonList;
-    public PokemonListAdapter(List<Pokemon> pokemonList) {
+    private OnClickOnNoteListener listener;
+    public PokemonListAdapter(List<Pokemon> pokemonList, OnClickOnNoteListener listener) {
         assert pokemonList != null;
         this.pokemonList =pokemonList;
+        this.listener = listener;
     }
     @NonNull
     @Override
@@ -30,6 +34,13 @@ public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.
         Pokemon pokemon = pokemonList.get(position);
         holder.binding.front.setImageResource(pokemon.getFrontResource());
         holder.viewModel.setPokemon(pokemon);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //holder.viewModel.setPokemon(pokemon);
+                listener.onClickOnNote(pokemon);
+            }
+        });
     }
     @Override
     public int getItemCount() {

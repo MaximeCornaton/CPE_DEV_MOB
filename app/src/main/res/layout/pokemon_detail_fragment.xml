@@ -2,11 +2,101 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    <data/>
+    <data>
+        <variable
+            name="pokemonViewModel"
+            type="fr.pokemongeo.gr1.PokemonViewModel" />
+    </data>
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="#FF0000"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+        android:background="#FFFFFF"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/Image"
+        android:layout_width="250dp"
+        android:layout_height="234dp"
+        android:layout_marginTop="24dp"
+    android:src="@{pokemonViewModel.getImage(context, pokemonViewModel.front)}"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/Nom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@{pokemonViewModel.name}"
+        android:textSize="30sp"
+    android:textAlignment="center"
+    app:layout_constraintTop_toBottomOf="@+id/Image"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="16dp"
+    android:textStyle="bold"
+    android:textColor="#000000"
+    />
+
+        <TextView
+            android:id="@+id/Type1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@{pokemonViewModel.type1}"
+            android:textColor="#007AFF"
+            android:textSize="25sp"
+            android:textStyle="italic"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Nom" />
+
+        <TextView
+            android:id="@+id/Type2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@{pokemonViewModel.type2}"
+            android:textColor="#007AFF"
+            android:textSize="25sp"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Nom" />
+
+        <TextView
+            android:id="@+id/Taille"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{pokemonViewModel.height}"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Type1" />
+
+    <TextView
+        android:id="@+id/Poids"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@{pokemonViewModel.weight}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Type2"
+        android:layout_marginEnd="16dp"
+        android:textSize="25sp"
+    android:textStyle="bold"
+    />
+
+    <TextView
+        android:id="@+id/Nombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@{pokemonViewModel.number}"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:textSize="25sp"
+    android:layout_marginEnd="16dp"
+    android:textStyle="bold"
+    android:textColor="#007AFF"
+    />
+</androidx.constraintlayout.widget.ConstraintLayout>
+    </layout>
