@@ -85,6 +85,18 @@
     android:textStyle="bold"
     />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/backButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="◀︎"
+            android:textColor="#007AFF"
+            android:textSize="25sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/Nombre"
         android:layout_width="wrap_content"
@@ -98,5 +110,9 @@
     android:textStyle="bold"
     android:textColor="#007AFF"
     />
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
     </layout>
