@@ -20,21 +20,13 @@ public class MainActivity extends AppCompatActivity {
     OnClickOnNoteListener listener = new OnClickOnNoteListener(){
         @Override
         public void onClickOnNote(Pokemon pokemon){
-            FragmentManager manager = getSupportFragmentManager();
-            FragmentTransaction transaction = manager.beginTransaction();
-            PokemonDetailFragment fragment = new PokemonDetailFragment(pokemon);
-            transaction.replace(R.id.fragment_container,fragment);
-            transaction.commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new PokemonDetailFragment(pokemon), "NomDuFragment")
+                    .addToBackStack(null)
+                    .commit();
         }
     };
-
-    public void onClickPokedex(){
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        PokedexFragment pokedexFragment = new PokedexFragment();
-        transaction.replace(R.id.fragment_container,pokedexFragment);
-        transaction.commit();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

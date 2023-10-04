@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -33,16 +34,19 @@ public class PokemonDetailFragment extends Fragment {
         viewModel.setPokemon(pokemon);
         binding.setPokemonViewModel(viewModel);
 
-        // Trouver le bouton Material
-        MaterialButton backButton = binding.getRoot().findViewById(R.id.backButton);
+        MaterialButton backButtonMaterial = binding.getRoot().findViewById(R.id.backButton);
 
         // Ajouter un listener de clic au bouton
-        backButton.setOnClickListener(new View.OnClickListener() {
+        backButtonMaterial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("i", "oui");
+                Log.d("PokemonDetailFragment", "Bouton back cliqué"); // Ajoutez cette ligne
+                // Retourner au fragment précédent
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.popBackStack();
             }
         });
+
 
         return binding.getRoot();
     }
