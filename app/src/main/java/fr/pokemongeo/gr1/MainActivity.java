@@ -1,7 +1,7 @@
 package fr.pokemongeo.gr1;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -33,12 +33,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         // Initialisation de la barre de navigation
-        //Toolbar toolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
 
-        // Afficher le bouton de retour (flèche vers la gauche) dans la barre de navigation
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setDisplayShowHomeEnabled(true);
+        bottomNavigationView = binding.navigation;
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         showStartup();
     }
 
@@ -49,6 +46,41 @@ public class MainActivity extends AppCompatActivity {
         PokedexFragment fragment = new PokedexFragment();
         fragment.setOnClickOnNoteListener(listener);
         transaction.replace(R.id.fragment_container,fragment);
+        transaction.commit();
+    }
+
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment fragment;
+            if (item.getItemId() == R.id.page_1) {
+                fragment = new PokedexFragment();
+                replaceFragment(fragment);
+                return true;
+            }
+            if (item.getItemId() == R.id.page_2) {
+                fragment = new PokedexFragment();
+                replaceFragment(fragment);
+                return true;
+            }
+            if (item.getItemId() == R.id.page_3) {
+                fragment = new PokedexFragment();
+                replaceFragment(fragment);
+                return true;
+            }
+            if (item.getItemId() == R.id.page_4) {
+                fragment = new PokedexFragment();
+                replaceFragment(fragment);
+                return true;
+            }
+            return false;
+        }
+    };
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
     }
 
