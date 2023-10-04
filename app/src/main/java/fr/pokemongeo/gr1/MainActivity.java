@@ -28,6 +28,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    public void onClickPokedex(){
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        PokedexFragment pokedexFragment = new PokedexFragment();
+        transaction.replace(R.id.fragment_container,pokedexFragment);
+        transaction.commit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
