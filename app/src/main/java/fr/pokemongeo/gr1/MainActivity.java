@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClickOnNote(Pokemon pokemon){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, new PokemonDetailFragment(pokemon), "NomDuFragment")
+                    .replace(R.id.fragment_container, new PokemonDetailFragment(pokemon))
                     .addToBackStack(null)
                     .commit();
         }
