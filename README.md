@@ -2,19 +2,13 @@
 Table Pokemon :
 
 ID (clé primaire)
+Capturé (bool)
 Nom du Pokémon
-Type
-Niveau
-Attaque
-Défense
-Points de vie (HP)
-
-----
-Table PokemonCapture :
-
-ID (clé primaire)
-ID du Pokémon (clé étrangère faisant référence à la table Pokemon)
-Date de capture
+Nom de l'image
+Type1
+Type2
+Height
+Weight
 
 ----
 Table Joueur :

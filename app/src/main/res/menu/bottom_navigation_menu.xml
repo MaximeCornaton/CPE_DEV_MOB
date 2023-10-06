@@ -10,10 +10,10 @@
     android:title="Map"/>
 <item
     android:id="@+id/page_3"
-    android:icon="@drawable/acier"
+    android:icon="@drawable/baseline_check_circle_outline_24"
     android:title="Caught"/>
 <item
     android:id="@+id/page_4"
-    android:icon="@drawable/acier"
+    android:icon="@drawable/baseline_shopping_bag_24"
     android:title="Inventaire"/>
 </menu>

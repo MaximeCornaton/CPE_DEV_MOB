@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             if (item.getItemId() == R.id.page_3) {
-                fragment = new PokedexFragment();
+                fragment = new CaughtFragment();
                 replaceFragment(fragment);
                 return true;
             }

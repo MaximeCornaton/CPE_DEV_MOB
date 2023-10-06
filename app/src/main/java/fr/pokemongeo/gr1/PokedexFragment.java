@@ -25,6 +25,8 @@ import fr.pokemongeo.gr1.databinding.PokedexFragmentBinding;
 
 public class PokedexFragment extends Fragment {
     private OnClickOnNoteListener listener;
+    private DBHelper dbHelper;
+
 
     public void setOnClickOnNoteListener(OnClickOnNoteListener listener)
     {
@@ -44,7 +46,9 @@ public class PokedexFragment extends Fragment {
         PokedexFragmentBinding binding = DataBindingUtil.inflate(inflater,
                 R.layout.pokedex_fragment,container,false);
         List<Pokemon> pokemonList = new ArrayList<>();
-
+        if (dbHelper == null) {
+            dbHelper = new DBHelper(getContext());
+        }
         // Ouverture du fichier dans assets
         InputStreamReader isr;
         try {
@@ -82,7 +86,11 @@ public class PokedexFragment extends Fragment {
                     String type2String = object.getString("type2");
                     type2 = POKEMON_TYPE.valueOf(type2String);
                 }
-                pokemonList.add(new Pokemon(i+1,name,imageId,type1,type2,weight,height));
+                Pokemon pokemon = new Pokemon(i+1,name,imageId,type1,type2,weight,height);
+                pokemonList.add(pokemon);
+                if (!dbHelper.isDatabaseCreated) {
+                    dbHelper.insertPokemon(pokemon);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
