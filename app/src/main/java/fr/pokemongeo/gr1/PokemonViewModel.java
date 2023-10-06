@@ -8,7 +8,7 @@ import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
 public class PokemonViewModel extends BaseObservable {
-    private Pokemon pokemon = new Pokemon();
+    private Pokemon pokemon;
     public void setPokemon(Pokemon pokemon) {
         this.pokemon = pokemon;
         notifyChange();

@@ -20,8 +20,6 @@ public class PokemonDetailFragment extends Fragment {
 
     public PokemonDetailFragment(Pokemon pokemon) {
         this.pokemon = pokemon;
-        pokemon.setHeight(100);
-        pokemon.setWeight(50);
     }
     @Nullable
     @Override

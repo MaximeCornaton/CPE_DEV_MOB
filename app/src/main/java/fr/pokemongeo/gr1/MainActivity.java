@@ -56,11 +56,12 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment;
             if (item.getItemId() == R.id.page_1) {
                 fragment = new PokedexFragment();
+                ((PokedexFragment) fragment).setOnClickOnNoteListener(listener);
                 replaceFragment(fragment);
                 return true;
             }
             if (item.getItemId() == R.id.page_2) {
-                fragment = new PokedexFragment();
+                fragment = new MapFragment();
                 replaceFragment(fragment);
                 return true;
             }

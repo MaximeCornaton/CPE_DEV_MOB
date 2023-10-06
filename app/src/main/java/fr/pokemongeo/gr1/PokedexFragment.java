@@ -71,6 +71,8 @@ public class PokedexFragment extends Fragment {
                 JSONObject object = array.getJSONObject(i);
                 String name = object.getString("name");
                 String image = object.getString("image");
+                double height = object.getDouble("height");
+                double weight = object.getDouble("weight");
                 int imageId = getResources().getIdentifier(image,"drawable",
                         binding.getRoot().getContext().getPackageName());
                 String type1String = object.getString("type1");
@@ -80,7 +82,7 @@ public class PokedexFragment extends Fragment {
                     String type2String = object.getString("type2");
                     type2 = POKEMON_TYPE.valueOf(type2String);
                 }
-                pokemonList.add(new Pokemon(i+1,name,imageId,type1,type2));
+                pokemonList.add(new Pokemon(i+1,name,imageId,type1,type2,weight,height));
             }
         } catch (JSONException e) {
             e.printStackTrace();

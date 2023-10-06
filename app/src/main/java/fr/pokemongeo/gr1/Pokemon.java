@@ -3,8 +3,8 @@ package fr.pokemongeo.gr1;
 public class Pokemon {
     private int order;
     private String name;
-    private int height;
-    private int weight;
+    private double height;
+    private double weight;
     private int frontResource;
     private POKEMON_TYPE type1;
     private POKEMON_TYPE type2;
@@ -15,12 +15,14 @@ public class Pokemon {
         type1 = POKEMON_TYPE.Plante;
     }
     public Pokemon(int order, String name, int frontResource,
-                   POKEMON_TYPE type1, POKEMON_TYPE type2) {
+                   POKEMON_TYPE type1, POKEMON_TYPE type2, double weight, double height) {
         this.order = order;
         this.name = name;
         this.frontResource = frontResource;
         this.type1 = type1;
         this.type2 = type2;
+        this.height = height;
+        this.weight = weight;
     }
 
     public String getName() {
@@ -35,16 +37,16 @@ public class Pokemon {
     public void setOrder(int order) {
         this.order = order;
     }
-    public int getHeight() {
+    public double getHeight() {
         return height;
     }
-    public void setHeight(int height) {
+    public void setHeight(double height) {
         this.height = height;
     }
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
-    public void setWeight(int weight) {
+    public void setWeight(double weight) {
         this.weight = weight;
     }
     public int getFrontResource() {
