@@ -18,7 +18,7 @@ public class Pokemon {
     public Pokemon(int order, String name, int frontResource,
                    POKEMON_TYPE type1, POKEMON_TYPE type2, double weight, double height) {
         this.order = order;
-        this.capture = false;
+        this.capture = true;
         this.name = name;
         this.frontResource = frontResource;
         this.type1 = type1;
@@ -79,4 +79,7 @@ public class Pokemon {
         return type2.name();
     }
     public boolean isCapture() { return capture; }
+
+    public void setCapture(boolean capture) {
+    }
 }

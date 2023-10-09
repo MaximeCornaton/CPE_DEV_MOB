@@ -1,6 +1,8 @@
 package fr.pokemongeo.gr1;
 
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +27,9 @@ import fr.pokemongeo.gr1.databinding.PokedexFragmentBinding;
 
 public class PokedexFragment extends Fragment {
     private OnClickOnNoteListener listener;
-    private DBHelper dbHelper;
+    //private DBHelper dbHelper;
+    private PokedexFragmentBinding binding;
+    private List<Pokemon> pokemonList;
 
 
     public void setOnClickOnNoteListener(OnClickOnNoteListener listener)
@@ -43,58 +47,16 @@ public class PokedexFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        PokedexFragmentBinding binding = DataBindingUtil.inflate(inflater,
+        binding = DataBindingUtil.inflate(inflater,
                 R.layout.pokedex_fragment,container,false);
-        List<Pokemon> pokemonList = new ArrayList<>();
-        if (dbHelper == null) {
-            dbHelper = new DBHelper(getContext());
+
+
+        if (pokemonList == null) {
+            // Charger les Pokémons à partir de la base de données
+            pokemonList = getAllPokemonsFromDatabase();
         }
-        // Ouverture du fichier dans assets
-        InputStreamReader isr;
-        try {
-            isr = new InputStreamReader(getResources().getAssets().open("pokemons.json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        BufferedReader reader = new BufferedReader(isr);
-        StringBuilder builder = new StringBuilder();
-        String data = "";
-        //lecture du fichier. data == null => EOF
-        while(data != null) {
-            try {
-                data = reader.readLine();
-                builder.append(data);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //Traitement du fichier
-        try {
-            JSONArray array = new JSONArray(builder.toString());
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                String name = object.getString("name");
-                String image = object.getString("image");
-                double height = object.getDouble("height");
-                double weight = object.getDouble("weight");
-                int imageId = getResources().getIdentifier(image,"drawable",
-                        binding.getRoot().getContext().getPackageName());
-                String type1String = object.getString("type1");
-                POKEMON_TYPE type1 = POKEMON_TYPE.valueOf(type1String);
-                POKEMON_TYPE type2 = null;
-                if (object.has("type2")) {
-                    String type2String = object.getString("type2");
-                    type2 = POKEMON_TYPE.valueOf(type2String);
-                }
-                Pokemon pokemon = new Pokemon(i+1,name,imageId,type1,type2,weight,height);
-                pokemonList.add(pokemon);
-                if (!dbHelper.isDatabaseCreated) {
-                    dbHelper.insertPokemon(pokemon);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+        Log.d("BBBB", "Number of Pokémon retrieved: " + pokemonList.size());
 
 
         // Création de l'adapter pour la liste
@@ -106,4 +68,34 @@ public class PokedexFragment extends Fragment {
                 binding.getRoot().getContext()));
         return binding.getRoot();
     }
+
+    private List<Pokemon> getAllPokemonsFromDatabase() {
+        List<Pokemon> pokemonList = new ArrayList<>();
+        Database database = Database.getInstance(getContext());
+        String[] columns = {"ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
+        Cursor cursor = database.query("Pokemon", columns, null, null, null, null, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int ordre = cursor.getInt(cursor.getColumnIndex("ordre"));
+                String name = cursor.getString(cursor.getColumnIndex("name"));
+                String image = cursor.getString(cursor.getColumnIndex("image"));
+                int frontResource = getResources().getIdentifier(image, "drawable", getContext().getPackageName());
+                double height = cursor.getDouble(cursor.getColumnIndex("height"));
+                double weight = cursor.getDouble(cursor.getColumnIndex("weight"));
+                String type1 = cursor.getString(cursor.getColumnIndex("type1"));
+                String type2 = cursor.getString(cursor.getColumnIndex("type2"));
+                boolean isCapture = cursor.getInt(cursor.getColumnIndex("capture")) == 1;
+
+                POKEMON_TYPE enumType1 = POKEMON_TYPE.valueOf(type1);
+                POKEMON_TYPE enumType2 = (type2 != null) ? POKEMON_TYPE.valueOf(type2) : null;
+                Pokemon pokemon = new Pokemon(ordre, name, frontResource, enumType1, enumType2, weight, height);
+                pokemonList.add(pokemon);
+            }
+            cursor.close();
+        }
+
+        return pokemonList;
+    }
+
 }
