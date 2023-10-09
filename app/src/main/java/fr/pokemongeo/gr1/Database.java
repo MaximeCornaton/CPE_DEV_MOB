@@ -43,6 +43,13 @@ public class Database {
         return cursor; //PENSER A CLOSE LA BDD DANS LE CODE APPELANT
     }
 
+    public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
+        db = helper.getWritableDatabase();
+        int rowsUpdated = db.update(table, values, whereClause, whereArgs);
+        db.close();
+        return rowsUpdated;
+    }
+
     private void loadPokemonFromJSON(Context context) {
         // Ouverture du fichier dans assets
         InputStreamReader isr;

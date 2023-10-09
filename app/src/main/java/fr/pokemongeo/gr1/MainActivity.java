@@ -7,8 +7,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -32,15 +37,42 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        // Initialisation de la barre de navigation
 
-        bottomNavigationView = binding.navigation;
-        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
-        showStartup();
+        if (isFirstLaunch()) {
+            // First app launch, show the WelcomeFragment
+            showWelcomeFragment();
+            setFirstLaunch(false);
+        } else {
+            // Not the first launch, show the main content
+            showStartup();
+        }
+    }
+
+    private boolean isFirstLaunch() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("firstLaunch", true);
+    }
+
+    private void showWelcomeFragment() {
+        // Initialize the WelcomeFragment
+        WelcomeFragment welcomeFragment = new WelcomeFragment();
+
+        // Replace the fragment container with WelcomeFragment
+        replaceFragment(welcomeFragment);
     }
 
 
+    private void setFirstLaunch(boolean isFirstLaunch) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("firstLaunch", isFirstLaunch);
+        editor.apply();
+    }
+
     public void showStartup() {
+        // Initialisation de la barre de navigation
+        bottomNavigationView = binding.navigation;
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         PokedexFragment fragment = new PokedexFragment();
@@ -85,4 +117,18 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    public void onPokemonSelected(String starter, Context context) {
+        Database database = Database.getInstance(context);
+        ContentValues updateValues = new ContentValues();
+        updateValues.put("capture", true);
+
+        // Define the WHERE clause and arguments
+        String whereClause = "name = ?";
+        String[] whereArgs = new String[] { starter };
+
+        // Update the rows in the "Pokemon" table
+        database.update("Pokemon", updateValues, whereClause, whereArgs);
+
+        showStartup();
+    }
 }

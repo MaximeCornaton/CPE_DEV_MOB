@@ -18,7 +18,7 @@ public class Pokemon {
     public Pokemon(int order, String name, int frontResource,
                    POKEMON_TYPE type1, POKEMON_TYPE type2, double weight, double height) {
         this.order = order;
-        this.capture = true;
+        this.capture = false;
         this.name = name;
         this.frontResource = frontResource;
         this.type1 = type1;
