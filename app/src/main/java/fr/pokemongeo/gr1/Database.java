@@ -2,6 +2,7 @@ package fr.pokemongeo.gr1;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -21,7 +22,6 @@ public class Database {
     public static Database getInstance(Context context) {
         if (instance == null) {
             instance = new Database(context);
-            instance.loadPokemonFromJSON(context);
         }
         return instance;
     }
@@ -50,56 +50,71 @@ public class Database {
         return rowsUpdated;
     }
 
-    private void loadPokemonFromJSON(Context context) {
-        // Ouverture du fichier dans assets
-        InputStreamReader isr;
-        try {
-            isr = new InputStreamReader(context.getResources().getAssets().open("pokemons.json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        BufferedReader reader = new BufferedReader(isr);
-        StringBuilder builder = new StringBuilder();
-        String data = "";
-        //lecture du fichier. data == null => EOF
-        while (data != null) {
+    void loadPokemonFromJSON(Context context) {
+        if (!hasDataLoaded(context)) {
+            // Ouverture du fichier dans assets
+            InputStreamReader isr;
             try {
-                data = reader.readLine();
-                builder.append(data);
+                isr = new InputStreamReader(context.getResources().getAssets().open("pokemons.json"));
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            BufferedReader reader = new BufferedReader(isr);
+            StringBuilder builder = new StringBuilder();
+            String data = "";
+            //lecture du fichier. data == null => EOF
+            while (data != null) {
+                try {
+                    data = reader.readLine();
+                    builder.append(data);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            //Traitement du fichier
+            try {
+                JSONArray array = new JSONArray(builder.toString());
+                for (int i = 0; i < array.length(); i++) {
+                    ContentValues values = new ContentValues();
+                    JSONObject object = array.getJSONObject(i);
+                    values.put("ordre", i + 1);
+                    String name = object.getString("name");
+                    values.put("name", name);
+
+                    String image = object.getString("image");
+                    double height = object.getDouble("height");
+                    values.put("height", height);
+                    double weight = object.getDouble("weight");
+                    values.put("weight", weight);
+                    int imageId = context.getResources().getIdentifier(image, "drawable",
+                            context.getPackageName());
+                    values.put("image", imageId);
+                    String type1String = object.getString("type1");
+                    values.put("type1", type1String);
+                    if (object.has("type2")) {
+                        String type2String = object.getString("type2");
+                        values.put("type2", type2String);
+                    }
+                    values.put("capture", false);
+                    instance.insert("Pokemon", null, values);
+                }
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
+            setHasDataLoaded(context, true);
         }
-        //Traitement du fichier
-        try {
-            JSONArray array = new JSONArray(builder.toString());
-            for (int i = 0; i < array.length(); i++) {
-                ContentValues values = new ContentValues();
-                JSONObject object = array.getJSONObject(i);
-                values.put("ordre", i + 1);
-                String name = object.getString("name");
-                values.put("name", name);
+    }
 
-                String image = object.getString("image");
-                double height = object.getDouble("height");
-                values.put("height", height);
-                double weight = object.getDouble("weight");
-                values.put("weight", weight);
-                int imageId = context.getResources().getIdentifier(image, "drawable",
-                        context.getPackageName());
-                values.put("image", imageId);
-                String type1String = object.getString("type1");
-                values.put("type1", type1String);
-                if (object.has("type2")) {
-                    String type2String = object.getString("type2");
-                    values.put("type2", type2String);
-                }
-                values.put("capture", false);
-                instance.insert("Pokemon", null, values);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private boolean hasDataLoaded(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("dataLoaded", false);
+    }
+
+    private void setHasDataLoaded(Context context, boolean loaded) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("dataLoaded", loaded);
+        editor.apply();
     }
 
 }

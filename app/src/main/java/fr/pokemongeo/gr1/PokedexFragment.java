@@ -29,7 +29,6 @@ public class PokedexFragment extends Fragment {
     private OnClickOnNoteListener listener;
     //private DBHelper dbHelper;
     private PokedexFragmentBinding binding;
-    private List<Pokemon> pokemonList;
 
 
     public void setOnClickOnNoteListener(OnClickOnNoteListener listener)
@@ -50,14 +49,8 @@ public class PokedexFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater,
                 R.layout.pokedex_fragment,container,false);
 
-
-        if (pokemonList == null) {
-            // Charger les Pokémons à partir de la base de données
-            pokemonList = getAllPokemonsFromDatabase();
-        }
-
-        Log.d("BBBB", "Number of Pokémon retrieved: " + pokemonList.size());
-
+        // Charger les Pokémons à partir de la base de données
+        List<Pokemon> pokemonList = getAllPokemonsFromDatabase();
 
         // Création de l'adapter pour la liste
         PokemonListAdapter adapter = new PokemonListAdapter(pokemonList, listener);
@@ -74,7 +67,7 @@ public class PokedexFragment extends Fragment {
         Database database = Database.getInstance(getContext());
         String[] columns = {"ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
         Cursor cursor = database.query("Pokemon", columns, null, null, null, null, null);
-
+        Log.d("AAAA", String.valueOf(pokemonList.size()));
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 int ordre = cursor.getInt(cursor.getColumnIndex("ordre"));

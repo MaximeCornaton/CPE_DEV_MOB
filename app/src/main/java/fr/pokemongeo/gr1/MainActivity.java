@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             }
             if (item.getItemId() == R.id.page_3) {
                 fragment = new CaughtFragment();
+                ((CaughtFragment) fragment).setOnClickOnNoteListener(listener);
                 replaceFragment(fragment);
                 return true;
             }
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPokemonSelected(String starter, Context context) {
         Database database = Database.getInstance(context);
+        database.loadPokemonFromJSON(context);
         ContentValues updateValues = new ContentValues();
         updateValues.put("capture", true);
 
