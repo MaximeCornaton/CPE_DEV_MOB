@@ -1,11 +1,8 @@
 package fr.pokemongeo.gr1;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -24,9 +21,6 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import fr.pokemongeo.gr1.databinding.ActivityMainBinding;
 
@@ -54,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
             String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
             ActivityCompat.requestPermissions(this, permissions, 1);
         } else {
-            // If permission is already granted, call setupLocation
-            Log.d("ZZZZ", "permission accordée, setup de la location");
             setupLocation();
         }
 
@@ -86,10 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showWelcomeFragment() {
-        // Initialize the WelcomeFragment
         WelcomeFragment welcomeFragment = new WelcomeFragment();
-
-        // Replace the fragment container with WelcomeFragment
         replaceFragment(welcomeFragment);
     }
 
