@@ -2,7 +2,6 @@ package fr.pokemongeo.gr1;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +66,6 @@ public class PokedexFragment extends Fragment {
         Database database = Database.getInstance(getContext());
         String[] columns = {"ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
         Cursor cursor = database.query("Pokemon", columns, null, null, null, null, null);
-        Log.d("AAAA", String.valueOf(pokemonList.size()));
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 int ordre = cursor.getInt(cursor.getColumnIndex("ordre"));

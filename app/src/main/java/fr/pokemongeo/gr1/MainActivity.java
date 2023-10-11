@@ -1,27 +1,39 @@
 package fr.pokemongeo.gr1;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import fr.pokemongeo.gr1.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private BottomNavigationView bottomNavigationView;
+    private LocationListener myLocationListener;
     OnClickOnNoteListener listener = new OnClickOnNoteListener(){
         @Override
         public void onClickOnNote(Pokemon pokemon){
@@ -37,6 +49,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        } else {
+            // If permission is already granted, call setupLocation
+            Log.d("ZZZZ", "permission accordée, setup de la location");
+            setupLocation();
+        }
+
+        myLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location newLocation) {}
+            @Override
+            public void onProviderDisabled(String provider) {}
+            @Override
+            public void onProviderEnabled(String provider) {}
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+        };
 
         if (isFirstLaunch()) {
             // First app launch, show the WelcomeFragment
@@ -132,5 +164,30 @@ public class MainActivity extends AppCompatActivity {
         database.update("Pokemon", updateValues, whereClause, whereArgs);
 
         showStartup();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull final String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, you can now call setupLocation
+                Log.d("XXXX", "onRequestPermissionsResult");
+                setupLocation();
+            } else {
+                // Permission denied, you may want to show an error message
+            }
+        }
+    }
+
+    private void setupLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1200, 100, myLocationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1200, 100, myLocationListener);
+        }
+        else {
+            Log.d("PERMISSIONS", "Permission non accordée: ");
+        }
     }
 }

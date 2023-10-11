@@ -8,6 +8,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +22,9 @@ import androidx.annotation.Nullable;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import fr.pokemongeo.gr1.databinding.MapFragmentBinding;
@@ -41,68 +43,42 @@ public class MapFragment extends Fragment {
         Context context = rootView.getContext();
         Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
 
-        mapView = rootView.findViewById(R.id.mapView); // Récupérer la référence du MapView à partir du layout
-        mapView.setBuiltInZoomControls(true);
-        mapView.setClickable(true);
-        mapView.getController().setZoom(18);
-        // Initialiser le MapView avec la source de tuiles
-        binding.mapView.setTileSource(TileSourceFactory.MAPNIK);
+        binding.mapView.setTileSource(TileSourceFactory.MAPNIK); // Fix the method call here
 
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            setupLocation();
-        } else {
-            // Demander la permission de localisation
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
+        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context), binding.mapView) {
+            @Override
+            public void onLocationChanged(Location location, IMyLocationProvider source) {
+                super.onLocationChanged(location, source);
+                if (location != null) {
+                    GeoPoint myLocation = new GeoPoint(location);
+                    binding.mapView.getController().animateTo(myLocation);
+                }
+            }
+        };
+        myLocationOverlay.enableMyLocation();
+        binding.mapView.getOverlays().add(myLocationOverlay);
+        binding.mapView.getController().setZoom(18);
 
-        return rootView; // Retourner la vue racine
+        return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         binding.mapView.onResume();
-        if (myLocationOverlay != null)
+        if (myLocationOverlay != null) {
             myLocationOverlay.enableMyLocation();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         binding.mapView.onPause();
-        if (myLocationOverlay != null)
+        if (myLocationOverlay != null) {
             myLocationOverlay.disableMyLocation();
-    }
-
-    private void setupLocation() {
-        Context context = requireContext();
-        MyLocationNewOverlay mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context), mapView);
-        mLocationOverlay.enableMyLocation();
-        mapView.getOverlays().add(mLocationOverlay);
-
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
-        LocationListener myLocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location newLocation) {
-                // Mettre à jour la position du marker en fonction de la nouvelle localisation
-                if (mapView != null && newLocation != null) {
-                    double latitude = newLocation.getLatitude();
-                    double longitude = newLocation.getLongitude();
-
-                    // Centrer la carte sur la nouvelle position de l'utilisateur
-                    mapView.getController().setCenter(new org.osmdroid.util.GeoPoint(latitude, longitude));
-                }
-            }
-
-            // Autres méthodes de l'interface LocationListener
-        };
-
-        // Demander les mises à jour de localisation
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 120, 100, myLocationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 120, 100, myLocationListener);
     }
+
 }
+
