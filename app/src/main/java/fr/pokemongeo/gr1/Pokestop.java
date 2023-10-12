@@ -1,24 +1,14 @@
 package fr.pokemongeo.gr1;
 
 public class Pokestop {
-    private int id;
     private String name;
     private String description;
     private int imageResource;
 
-    public Pokestop(int id, String name, String description, int imageResource) {
-        this.id = id;
+    public Pokestop(String name, String description, int imageResource) {
         this.name = name;
         this.description = description;
         this.imageResource = imageResource;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
