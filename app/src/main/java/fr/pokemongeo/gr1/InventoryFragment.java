@@ -27,8 +27,8 @@ public class InventoryFragment extends Fragment {
                 R.layout.inventory_fragment,container,false);
 
         List<Item> itemList = getAllItemsFromDatabase();
-        itemList.add(new Item("Potion", "potion", "Restaure 20 PV", 3));
-        itemList.add(new Item("Super Potion", "super_potion", "Restaure 50 PV", 1));
+        itemList.add(new Potion("Potion", "potion", "Restaure 20 PV", 3, 20));
+        itemList.add(new Potion("Super Potion", "super_potion", "Restaure 50 PV", 1, 50));
 
         ItemListAdapter adapter = new ItemListAdapter(itemList);
 
@@ -42,18 +42,30 @@ public class InventoryFragment extends Fragment {
     private List<Item> getAllItemsFromDatabase() {
         List<Item> itemList = new ArrayList<>();
         Database database = Database.getInstance(getContext());
-        String column[] = {"name", "image", "description", "quantity"};
+        String column[] = {"name", "image", "description", "quantity", "item_type"};
         Cursor cursor = database.query("Items", column, null, null, null, null, null);
+
         if (cursor.moveToFirst()) {
             do {
                 String name = cursor.getString(0);
                 String image = cursor.getString(1);
                 String description = cursor.getString(2);
                 int quantity = cursor.getInt(3);
-                itemList.add(new Item(name, image, description, quantity));
+                String itemType = cursor.getString(4); // Lire le type d'item depuis la base de données
+
+                // Créez l'instance appropriée en fonction du type d'item
+                Item item;
+                if ("pokeball".equals(itemType)) {
+                    item = new Ball(name, image, description, quantity);
+                } else {
+                    item = new Potion(name, image, description, quantity);
+                }
+
+                itemList.add(item);
             } while (cursor.moveToNext());
         }
         cursor.close();
         return itemList;
     }
+
 }

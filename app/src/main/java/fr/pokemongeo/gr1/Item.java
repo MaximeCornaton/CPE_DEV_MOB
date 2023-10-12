@@ -1,6 +1,6 @@
 package fr.pokemongeo.gr1;
 
-public class Item {
+public abstract class Item {
     private String name;
     private String image;
     private String description;
