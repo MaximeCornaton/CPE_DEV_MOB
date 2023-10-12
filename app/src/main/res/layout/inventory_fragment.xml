@@ -10,7 +10,7 @@
         >
         <androidx.recyclerview.widget.RecyclerView
             android:background="#00FF00"
-            android:id="@+id/inventory_list"
+            android:id="@+id/itemList"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +20,6 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            />
+            android:layout_marginBottom="5dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

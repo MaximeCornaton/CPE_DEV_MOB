@@ -22,6 +22,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE Pokemon (id INTEGER PRIMARY KEY, ordre INTEGER, capture BOOLEAN, name TEXT, image TEXT, type1 TEXT, type2 TEXT, height DOUBLE, weight DOUBLE)");
+        db.execSQL("CREATE TABLE Item (id INTEGER PRIMARY KEY, name TEXT, image TEXT, description TEXT, quantity INTEGER)");
     }
 
     @Override
