@@ -32,7 +32,7 @@ public class Database {
 
     public long insert(String table, String nullColumnHack, ContentValues values) {
         db = helper.getWritableDatabase();
-        long rowId = db.insert("Pokemon", null, values);
+        long rowId = db.insert(table, null, values);
         db.close();
         return rowId;
     }
