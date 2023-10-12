@@ -10,6 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import fr.pokemongeo.gr1.databinding.InventoryFragmentBinding;
+
 public class InventoryFragment extends Fragment {
 
     private InventoryFragmentBinding binding;

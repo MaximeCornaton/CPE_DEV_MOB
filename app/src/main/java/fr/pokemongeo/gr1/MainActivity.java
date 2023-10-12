@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             if (item.getItemId() == R.id.page_4) {
-                fragment = new PokedexFragment();
+                fragment = new InventoryFragment();
                 replaceFragment(fragment);
                 return true;
             }
