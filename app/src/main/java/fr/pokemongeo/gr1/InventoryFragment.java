@@ -28,6 +28,7 @@ public class InventoryFragment extends Fragment {
 
         List<Item> itemList = getAllItemsFromDatabase();
         itemList.add(new Item("Potion", "potion", "Restaure 20 PV", 3));
+        itemList.add(new Item("Super Potion", "super_potion", "Restaure 50 PV", 1));
 
         ItemListAdapter adapter = new ItemListAdapter(itemList);
 
