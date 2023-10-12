@@ -6,7 +6,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,23 +25,33 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import fr.pokemongeo.gr1.databinding.MapFragmentBinding;
 
 
 public class MapFragment extends Fragment {
     private MapFragmentBinding binding;
     private MyLocationNewOverlay myLocationOverlay;
+    private Map<Marker, Pokemon> markerPokemonMap = new HashMap<>();
     private boolean spawnPokemonHandlerPosted = false;
     private final Handler handler = new Handler();
     private final Runnable spawnPokemonRunnable = new Runnable() {
         @Override
         public void run() {
-            if ((spawnPokemonHandlerPosted) && (myLocationOverlay.getMyLocation()) != null) {
-                spawnRandomPokemon(myLocationOverlay.getMyLocation());
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (spawnPokemonHandlerPosted && myLocationOverlay.getMyLocation() != null) {
+                            spawnRandomPokemon(myLocationOverlay.getMyLocation());
+                        }
+                    }
+                }, 3000); // Wait for 3 seconds before the first appearance
+
                 handler.postDelayed(this, 30000); // Wait for 30 seconds before the next appearance
             }
-        }
-    };
+        };
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -115,6 +124,7 @@ public class MapFragment extends Fragment {
         marker.setPosition(randomLocation);
         marker.setIcon(getResources().getDrawable(randomPokemon.getFrontResource()));
         marker.setTitle(randomPokemon.getName());
+        markerPokemonMap.put(marker, randomPokemon);
         binding.mapView.getOverlays().add(marker);
 
         // Rafraîchissez la carte
@@ -123,7 +133,7 @@ public class MapFragment extends Fragment {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 // Replace the MapFragment with the GotchaFragment
-                CaptureFragment captureFragment = new CaptureFragment();
+                CaptureFragment captureFragment = new CaptureFragment(markerPokemonMap.get(marker));
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, captureFragment);
                 transaction.addToBackStack(null); // Optional, to allow back navigation
