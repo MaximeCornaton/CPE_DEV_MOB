@@ -15,10 +15,12 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentTransaction;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
@@ -35,8 +37,10 @@ public class MapFragment extends Fragment {
     private final Runnable spawnPokemonRunnable = new Runnable() {
         @Override
         public void run() {
-            spawnRandomPokemon(myLocationOverlay.getMyLocation());
-            handler.postDelayed(this, 30000); // Attendre 30 secondes avant la prochaine apparition
+            if ((spawnPokemonHandlerPosted) && (myLocationOverlay.getMyLocation()) != null) {
+                spawnRandomPokemon(myLocationOverlay.getMyLocation());
+                handler.postDelayed(this, 30000); // Wait for 30 seconds before the next appearance
+            }
         }
     };
 
@@ -115,6 +119,18 @@ public class MapFragment extends Fragment {
 
         // Rafraîchissez la carte
         binding.mapView.invalidate();
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                // Replace the MapFragment with the GotchaFragment
+                CaptureFragment captureFragment = new CaptureFragment();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, captureFragment);
+                transaction.addToBackStack(null); // Optional, to allow back navigation
+                transaction.commit();
+                return true;
+            }
+        });
     }
 
     private Pokemon getRandomPokemonFromDatabase() {
@@ -145,7 +161,14 @@ public class MapFragment extends Fragment {
         cursor.close();
         return null;
     }
+    public void startPokemonSpawning() {
+        spawnPokemonHandlerPosted = true;
+        handler.post(spawnPokemonRunnable);
+    }
 
+    public void stopPokemonSpawning() {
+        spawnPokemonHandlerPosted = false;
+    }
 
 }
 

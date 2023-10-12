@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    tools:context=".CaptureFragment">
+
+    <data>
+        <variable
+            name="pokemonViewModel"
+            type="fr.pokemongeo.gr1.PokemonViewModel" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/pokemonImageView"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:src="@{pokemonViewModel.getImage(context, pokemonViewModel.front)}"
+            android:scaleType="fitCenter" />
+
+
+        <Button
+            android:id="@+id/catchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/pokemonImageView"
+            android:layout_marginTop="16dp"
+            android:text="Catch"
+            android:textSize="18sp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:textColor="#FFFFFF"
+            />
+
+    </RelativeLayout>
+</layout>
