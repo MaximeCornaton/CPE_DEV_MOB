@@ -2,6 +2,7 @@ package fr.pokemongeo.gr1;
 
 import android.content.ContentValues;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -51,6 +53,18 @@ public class CaptureFragment extends Fragment {
 
                 // After capturing, you might want to navigate back to the previous fragment or activity
                 getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
+        MaterialButton backButtonMaterial = rootView.findViewById(R.id.backButton);
+        // Ajouter un listener de clic au bouton
+        backButtonMaterial.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("PokemonDetailFragment", "Bouton back cliqué"); // Ajoutez cette ligne
+                // Retourner au fragment précédent
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.popBackStack();
             }
         });
 

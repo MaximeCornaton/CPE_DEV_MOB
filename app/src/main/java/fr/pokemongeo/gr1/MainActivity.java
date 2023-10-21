@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private BottomNavigationView bottomNavigationView;
     private LocationListener myLocationListener;
+    private MapFragment mapFragment;
+
     OnClickOnNoteListener listener = new OnClickOnNoteListener(){
         @Override
         public void onClickOnNote(Pokemon pokemon){
@@ -114,8 +116,10 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             if (item.getItemId() == R.id.page_2) {
-                fragment = new MapFragment();
-                replaceFragment(fragment);
+                if (mapFragment == null) {
+                    mapFragment = new MapFragment();
+                }
+                replaceFragment(mapFragment);
                 return true;
             }
             if (item.getItemId() == R.id.page_3) {
@@ -138,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
     }
+
+
 
     public void onPokemonSelected(String starter, Context context) {
         Database database = Database.getInstance(context);

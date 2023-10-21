@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,24 +35,33 @@ import fr.pokemongeo.gr1.databinding.MapFragmentBinding;
 public class MapFragment extends Fragment {
     private MapFragmentBinding binding;
     private MyLocationNewOverlay myLocationOverlay;
+    private PokemonViewModel pokemonViewModel;
     private Map<Marker, Pokemon> markerPokemonMap = new HashMap<>();
     private boolean spawnPokemonHandlerPosted = false;
     private final Handler handler = new Handler();
     private final Runnable spawnPokemonRunnable = new Runnable() {
         @Override
         public void run() {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (spawnPokemonHandlerPosted && myLocationOverlay.getMyLocation() != null) {
-                            spawnRandomPokemon(myLocationOverlay.getMyLocation());
-                        }
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (spawnPokemonHandlerPosted && myLocationOverlay.getMyLocation() != null) {
+                        spawnRandomPokemon(myLocationOverlay.getMyLocation());
                     }
-                }, 3000); // Wait for 3 seconds before the first appearance
+                }
+            }, 3000); // Wait for 3 seconds before the first appearance
 
-                handler.postDelayed(this, 30000); // Wait for 30 seconds before the next appearance
-            }
-        };
+            handler.postDelayed(this, 30000); // Wait for 30 seconds before the next appearance
+        }
+    };
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            markerPokemonMap = (HashMap<Marker, Pokemon>) savedInstanceState.getSerializable("markerPokemonMap");
+        }
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,6 +70,7 @@ public class MapFragment extends Fragment {
         View rootView = binding.getRoot();
         Context context = rootView.getContext();
         Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
+        pokemonViewModel = new PokemonViewModel();
 
         binding.mapView.setTileSource(TileSourceFactory.MAPNIK); // Fix the method call here
 
@@ -82,24 +93,6 @@ public class MapFragment extends Fragment {
         binding.mapView.getController().setZoom(18);
 
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        binding.mapView.onResume();
-        if (myLocationOverlay != null) {
-            myLocationOverlay.enableMyLocation();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        binding.mapView.onPause();
-        if (myLocationOverlay != null) {
-            myLocationOverlay.disableMyLocation();
-        }
     }
 
     public GeoPoint generateRandomLocation(GeoPoint playerLocation, double radius) {
@@ -125,6 +118,7 @@ public class MapFragment extends Fragment {
         marker.setIcon(getResources().getDrawable(randomPokemon.getFrontResource()));
         marker.setTitle(randomPokemon.getName());
         markerPokemonMap.put(marker, randomPokemon);
+        pokemonViewModel.addPokemon(marker, randomPokemon);
         binding.mapView.getOverlays().add(marker);
 
         // Rafraîchissez la carte
@@ -171,14 +165,40 @@ public class MapFragment extends Fragment {
         cursor.close();
         return null;
     }
-    public void startPokemonSpawning() {
-        spawnPokemonHandlerPosted = true;
-        handler.post(spawnPokemonRunnable);
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("markerPokemonMap", new HashMap<>(markerPokemonMap));
     }
 
-    public void stopPokemonSpawning() {
-        spawnPokemonHandlerPosted = false;
+    @Override
+    public void onPause() {
+        super.onPause();
+        binding.mapView.onPause();
+        if (myLocationOverlay != null) {
+            myLocationOverlay.disableMyLocation();
+        }
+
+        // Enregistrez l'emplacement actuel des marqueurs
+        markerPokemonMap.keySet().clear();
+        for (Map.Entry<Marker, Pokemon> entry : markerPokemonMap.entrySet()) {
+            markerPokemonMap.keySet().add(entry.getKey());
+        }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        binding.mapView.onResume();
+        if (myLocationOverlay != null) {
+            myLocationOverlay.enableMyLocation();
+        }
+
+/*        Log.d("AHAHAHAH", pokemonViewModel.getPokemonMap().keySet().toString());
+        // Restaurez les marqueurs à partir de la liste
+        for (Marker marker : pokemonViewModel.getPokemonMap().keySet()) {
+            binding.mapView.getOverlays().add(marker);
+        }*/
+    }
 }
 
