@@ -1,6 +1,7 @@
 package fr.pokemongeo.gr1;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
@@ -11,21 +12,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentTransaction;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,8 +37,7 @@ import fr.pokemongeo.gr1.databinding.MapFragmentBinding;
 public class MapFragment extends Fragment {
     private MapFragmentBinding binding;
     private MyLocationNewOverlay myLocationOverlay;
-    private PokemonViewModel pokemonViewModel;
-    private Map<Marker, Pokemon> markerPokemonMap = new HashMap<>();
+    private Map<GeoPoint, Pokemon> markerPokemonMap = new HashMap<>();
     private boolean spawnPokemonHandlerPosted = false;
     private final Handler handler = new Handler();
     private final Runnable spawnPokemonRunnable = new Runnable() {
@@ -56,31 +57,27 @@ public class MapFragment extends Fragment {
     };
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            markerPokemonMap = (HashMap<Marker, Pokemon>) savedInstanceState.getSerializable("markerPokemonMap");
-        }
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater,
-                R.layout.map_fragment, container, false);
+        binding = MapFragmentBinding.inflate(inflater, container, false);
         View rootView = binding.getRoot();
         Context context = rootView.getContext();
         Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
-        pokemonViewModel = new PokemonViewModel();
 
-        binding.mapView.setTileSource(TileSourceFactory.MAPNIK); // Fix the method call here
+        return rootView;
+    }
 
-        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context), binding.mapView) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        binding.mapView.setTileSource(TileSourceFactory.MAPNIK);
+
+        myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getContext()), binding.mapView) {
             @Override
             public void onLocationChanged(Location location, IMyLocationProvider source) {
                 super.onLocationChanged(location, source);
                 if (location != null) {
                     GeoPoint myLocation = new GeoPoint(location);
-                    binding.mapView.getController().animateTo(myLocation);
+                    binding.mapView.getController().setCenter(myLocation);
                     if (!spawnPokemonHandlerPosted) {
                         spawnPokemonHandlerPosted = true;
                         handler.post(spawnPokemonRunnable);
@@ -91,8 +88,6 @@ public class MapFragment extends Fragment {
         myLocationOverlay.enableMyLocation();
         binding.mapView.getOverlays().add(myLocationOverlay);
         binding.mapView.getController().setZoom(18);
-
-        return rootView;
     }
 
     public GeoPoint generateRandomLocation(GeoPoint playerLocation, double radius) {
@@ -106,24 +101,21 @@ public class MapFragment extends Fragment {
         return new GeoPoint(lat, lon);
     }
     public void spawnRandomPokemon(GeoPoint playerPosition) {
-        // Générez un emplacement aléatoire autour du joueur
+        // Génère un emplacement aléatoire autour du joueur
         GeoPoint randomLocation = generateRandomLocation(playerPosition, 1);
-
-        // Sélectionnez un Pokémon aléatoire depuis votre base de données
         Pokemon randomPokemon = getRandomPokemonFromDatabase();
 
-        // Ajoutez le Pokémon sur la carte
+        // Ajoute le Pokémon sur la carte
         Marker marker = new Marker(binding.mapView);
         marker.setPosition(randomLocation);
         marker.setIcon(getResources().getDrawable(randomPokemon.getFrontResource()));
         marker.setTitle(randomPokemon.getName());
-        markerPokemonMap.put(marker, randomPokemon);
-        pokemonViewModel.addPokemon(marker, randomPokemon);
+        markerPokemonMap.put(randomLocation, randomPokemon);
         binding.mapView.getOverlays().add(marker);
 
-        // Rafraîchissez la carte
+        // Met à jour la carte
         binding.mapView.invalidate();
-        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+        /*marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker, MapView mapView) {
                 // Replace the MapFragment with the GotchaFragment
@@ -134,13 +126,13 @@ public class MapFragment extends Fragment {
                 transaction.commit();
                 return true;
             }
-        });
+        });*/
     }
 
     private Pokemon getRandomPokemonFromDatabase() {
         Database db = Database.getInstance(getContext());
 
-        // Sélectionnez un Pokémon aléatoire qui n'a pas encore été capturé
+        // Sélectionnez un Pokémon aléatoire dans la base de données
         String[] columns = {"ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
         Cursor cursor = db.query("Pokemon", columns, null, null, null, null, "RANDOM()");
 
@@ -165,11 +157,6 @@ public class MapFragment extends Fragment {
         cursor.close();
         return null;
     }
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("markerPokemonMap", new HashMap<>(markerPokemonMap));
-    }
 
     @Override
     public void onPause() {
@@ -179,11 +166,15 @@ public class MapFragment extends Fragment {
             myLocationOverlay.disableMyLocation();
         }
 
-        // Enregistrez l'emplacement actuel des marqueurs
-        markerPokemonMap.keySet().clear();
-        for (Map.Entry<Marker, Pokemon> entry : markerPokemonMap.entrySet()) {
-            markerPokemonMap.keySet().add(entry.getKey());
-        }
+        // Sauvegarde markerPokemonMap dans les préférences partagées
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        SharedPreferences.Editor editor = preferences.edit();
+
+        Gson gson = new Gson();
+        String json = gson.toJson(markerPokemonMap);
+        editor.putString("markerPokemonMap", json);
+        Log.d("WTF2", "markerPokemonMap enregistrée dans onPause : " + markerPokemonMap);
+        editor.apply();
     }
 
     @Override
@@ -194,11 +185,48 @@ public class MapFragment extends Fragment {
             myLocationOverlay.enableMyLocation();
         }
 
-/*        Log.d("AHAHAHAH", pokemonViewModel.getPokemonMap().keySet().toString());
-        // Restaurez les marqueurs à partir de la liste
-        for (Marker marker : pokemonViewModel.getPokemonMap().keySet()) {
-            binding.mapView.getOverlays().add(marker);
-        }*/
+        // Restaure markerPokemonMap depuis les préférences partagées
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        String json = preferences.getString("markerPokemonMap", null);
+
+        if (json != null) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<Map<String, Pokemon>>() {}.getType();
+            Map<String, Pokemon> mapFromJson = gson.fromJson(json, type);
+
+            // Convertir les clés (GeoPoint) de String en GeoPoint si nécessaire
+            Map<GeoPoint, Pokemon> convertedMap = new HashMap<>();
+            for (String geoPointStr : mapFromJson.keySet()) {
+                GeoPoint geoPoint = GeoPoint.fromDoubleString(geoPointStr, ',');
+                convertedMap.put(geoPoint, mapFromJson.get(geoPointStr));
+            }
+            markerPokemonMap = convertedMap;
+            for (Map.Entry<GeoPoint, Pokemon> entry : markerPokemonMap.entrySet()) {
+                GeoPoint geoPoint = entry.getKey();
+                Pokemon pokemon = entry.getValue();
+
+                // Créer un marqueur à la localisation du GeoPoint
+                Marker marker = new Marker(binding.mapView);
+                marker.setPosition(geoPoint);
+                marker.setIcon(getResources().getDrawable(pokemon.getFrontResource()));
+                marker.setTitle(pokemon.getName());
+                binding.mapView.getOverlays().add(marker);
+                /*marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+                        // Replace the MapFragment with the GotchaFragment
+                        CaptureFragment captureFragment = new CaptureFragment(markerPokemonMap.get(marker));
+                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.fragment_container, captureFragment);
+                        transaction.addToBackStack(null); // Optional, to allow back navigation
+                        transaction.commit();
+                        return true;
+                    }
+                });*/
+            }
+            // Met à jour la carte
+            binding.mapView.invalidate();
+        }
     }
 }
 

@@ -16,14 +16,6 @@ import java.util.Map;
 
 public class PokemonViewModel extends BaseObservable {
     private Pokemon pokemon;
-    private Map<Marker, Pokemon> pokemonMap = new HashMap<>();
-    public Map<Marker, Pokemon> getPokemonMap() {
-        return pokemonMap;
-    }
-    public void addPokemon(Marker marker, Pokemon pokemon) {
-        pokemonMap.put(marker, pokemon);
-    }
-
     public void setPokemon(Pokemon pokemon) {
         this.pokemon = pokemon;
         notifyChange();
