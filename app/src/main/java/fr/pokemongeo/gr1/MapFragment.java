@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -22,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
@@ -112,21 +114,10 @@ public class MapFragment extends Fragment {
         marker.setTitle(randomPokemon.getName());
         markerPokemonMap.put(randomLocation, randomPokemon);
         binding.mapView.getOverlays().add(marker);
+        addListenerToMarker(marker, randomPokemon);
 
         // Met à jour la carte
         binding.mapView.invalidate();
-        /*marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker, MapView mapView) {
-                // Replace the MapFragment with the GotchaFragment
-                CaptureFragment captureFragment = new CaptureFragment(markerPokemonMap.get(marker));
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, captureFragment);
-                transaction.addToBackStack(null); // Optional, to allow back navigation
-                transaction.commit();
-                return true;
-            }
-        });*/
     }
 
     private Pokemon getRandomPokemonFromDatabase() {
@@ -173,7 +164,6 @@ public class MapFragment extends Fragment {
         Gson gson = new Gson();
         String json = gson.toJson(markerPokemonMap);
         editor.putString("markerPokemonMap", json);
-        Log.d("WTF2", "markerPokemonMap enregistrée dans onPause : " + markerPokemonMap);
         editor.apply();
     }
 
@@ -191,7 +181,8 @@ public class MapFragment extends Fragment {
 
         if (json != null) {
             Gson gson = new Gson();
-            Type type = new TypeToken<Map<String, Pokemon>>() {}.getType();
+            Type type = new TypeToken<Map<String, Pokemon>>() {
+            }.getType();
             Map<String, Pokemon> mapFromJson = gson.fromJson(json, type);
 
             // Convertir les clés (GeoPoint) de String en GeoPoint si nécessaire
@@ -201,32 +192,35 @@ public class MapFragment extends Fragment {
                 convertedMap.put(geoPoint, mapFromJson.get(geoPointStr));
             }
             markerPokemonMap = convertedMap;
-            for (Map.Entry<GeoPoint, Pokemon> entry : markerPokemonMap.entrySet()) {
-                GeoPoint geoPoint = entry.getKey();
-                Pokemon pokemon = entry.getValue();
-
-                // Créer un marqueur à la localisation du GeoPoint
-                Marker marker = new Marker(binding.mapView);
-                marker.setPosition(geoPoint);
-                marker.setIcon(getResources().getDrawable(pokemon.getFrontResource()));
-                marker.setTitle(pokemon.getName());
-                binding.mapView.getOverlays().add(marker);
-                /*marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker, MapView mapView) {
-                        // Replace the MapFragment with the GotchaFragment
-                        CaptureFragment captureFragment = new CaptureFragment(markerPokemonMap.get(marker));
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.fragment_container, captureFragment);
-                        transaction.addToBackStack(null); // Optional, to allow back navigation
-                        transaction.commit();
-                        return true;
-                    }
-                });*/
-            }
-            // Met à jour la carte
-            binding.mapView.invalidate();
         }
+        for (Map.Entry<GeoPoint, Pokemon> entry : markerPokemonMap.entrySet()) {
+            GeoPoint geoPoint = entry.getKey();
+            Pokemon pokemon = entry.getValue();
+
+            // Créer un marqueur à la localisation du GeoPoint
+            Marker marker = new Marker(binding.mapView);
+            marker.setPosition(geoPoint);
+            marker.setIcon(getResources().getDrawable(pokemon.getFrontResource()));
+            marker.setTitle(pokemon.getName());
+            binding.mapView.getOverlays().add(marker);
+            addListenerToMarker(marker, pokemon);
+        }
+        // Met à jour la carte
+        binding.mapView.invalidate();
+    }
+
+    private void addListenerToMarker(Marker marker, Pokemon pokemon) {
+        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                CaptureFragment captureFragment = new CaptureFragment(pokemon);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, captureFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                return true;
+            }
+        });
     }
 }
 

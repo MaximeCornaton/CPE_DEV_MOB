@@ -82,4 +82,18 @@ public class Pokemon {
 
     public void setCapture(boolean capture) {
     }
+
+    @Override
+    public String toString() {
+        return "Pokemon{" +
+                "order=" + order +
+                ", capture=" + capture +
+                ", name='" + name + '\'' +
+                ", height=" + height +
+                ", weight=" + weight +
+                ", frontResource=" + frontResource +
+                ", type1=" + type1 +
+                ", type2=" + type2 +
+                '}';
+    }
 }
