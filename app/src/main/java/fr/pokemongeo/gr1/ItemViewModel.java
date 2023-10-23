@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
@@ -31,6 +30,16 @@ public class ItemViewModel extends BaseObservable {
     @Bindable
     public String getFront() {
         return item.getFront();
+    }
+
+    @Bindable
+    public String getQuantity() {
+        return String.valueOf(item.getQuantity());
+    }
+
+    @Bindable
+    public String getDescription() {
+        return item.getDescription();
     }
 
 }

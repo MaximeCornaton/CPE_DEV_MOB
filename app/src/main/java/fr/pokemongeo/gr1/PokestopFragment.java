@@ -1,5 +1,7 @@
 package fr.pokemongeo.gr1;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,15 +58,61 @@ public class PokestopFragment extends Fragment {
         int itemCount = random.nextInt(maxCount - minCount + 1) + minCount; // Générer un nombre entre minCount et maxCount inclus
         List<Item> items = new ArrayList<>();
 
+        String[] ballNames = { "Pokeball", "Superball", "Hyperball" };
+        String[] potionNames = { "Potion", "Super Potion", "Hyper Potion" };
+
         for (int i = 0; i < itemCount; i++) {
             // Générer aléatoirement un type d'item (pokeball ou potion)
             if (random.nextBoolean()) {
-                items.add(new Ball("Pokeball", "description", 1, 50));
+                // Sélectionnez un nom de ball au hasard
+                String randomBallName = ballNames[random.nextInt(ballNames.length)];
+                Ball ball = new Ball(randomBallName, "description", 1, 50);
+                items.add(ball);
+                updateDatabase(randomBallName);
             } else {
-                items.add(new Potion("Potion", "description", 1, 50));
+                // Sélectionnez un nom de potion au hasard
+                String randomPotionName = potionNames[random.nextInt(potionNames.length)];
+                Potion potion = new Potion(randomPotionName, "description", 1, 50);
+                items.add(potion);
+                updateDatabase(randomPotionName);
             }
         }
 
         return items;
     }
+
+    private void updateDatabase(String name) {
+        Database db = Database.getInstance(getContext());
+
+        ContentValues values = new ContentValues();
+        values.put("quantity", getItemQuantity(name) + 1); // Ajoute 1 à la quantité actuelle
+
+        // Spécifiez la condition pour mettre à jour l'item avec le nom donné
+        String whereClause = "name = ?";
+        String[] whereArgs = { name };
+
+        // Mettez à jour la base de données en utilisant la méthode update
+        db.update("Items", values, whereClause, whereArgs);
+    }
+
+    // Méthode pour obtenir la quantité actuelle d'un item
+    private int getItemQuantity(String name) {
+        Database db = Database.getInstance(getContext());
+        String[] columns = { "quantity" };
+        String whereClause = "name = ?";
+        String[] whereArgs = { name };
+
+        // Exécutez une requête pour obtenir la quantité actuelle
+        Cursor cursor = db.query("Items", columns, whereClause, whereArgs, null, null, null);
+
+        int quantity = 0;
+        if (cursor != null && cursor.moveToFirst()) {
+            quantity = cursor.getInt(cursor.getColumnIndex("quantity"));
+            cursor.close();
+        }
+
+        return quantity;
+    }
+
+
 }
