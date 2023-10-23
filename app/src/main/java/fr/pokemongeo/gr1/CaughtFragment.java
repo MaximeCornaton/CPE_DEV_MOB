@@ -2,6 +2,7 @@ package fr.pokemongeo.gr1;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +53,7 @@ public class CaughtFragment extends Fragment {
     private List<Pokemon> getAllCapturedPokemonsFromDatabase() {
         List<Pokemon> pokemonList = new ArrayList<>();
         Database database = Database.getInstance(getContext());
-        String[] columns = {"ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
+        String[] columns = {"id", "ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
         String selection = "capture = ?"; // WHERE clause
         String[] selectionArgs = {"1"};    // Value for capture = true
 
@@ -72,11 +73,11 @@ public class CaughtFragment extends Fragment {
                 POKEMON_TYPE enumType1 = POKEMON_TYPE.valueOf(type1);
                 POKEMON_TYPE enumType2 = (type2 != null) ? POKEMON_TYPE.valueOf(type2) : null;
                 Pokemon pokemon = new Pokemon(ordre, name, frontResource, enumType1, enumType2, weight, height);
+                pokemon.setId(cursor.getInt(cursor.getColumnIndex("id")));
                 pokemonList.add(pokemon);
             }
             cursor.close();
         }
-
         return pokemonList;
     }
 

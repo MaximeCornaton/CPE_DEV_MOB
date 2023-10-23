@@ -13,7 +13,7 @@ import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "pokebase.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -27,10 +27,5 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //if (oldVersion < 2) {
-            // Add the "ordre" column for version 2
-            //db.execSQL("ALTER TABLE Pokemon ADD COLUMN ordre INTEGER");
-        //}
-        db.execSQL("CREATE TABLE Items (id INTEGER PRIMARY KEY, name TEXT, image TEXT, description TEXT, quantity INTEGER, item_type TEXT)");
     }
 }

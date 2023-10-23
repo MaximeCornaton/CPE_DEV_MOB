@@ -44,12 +44,9 @@ public class CaptureFragment extends Fragment {
                 Database database = Database.getInstance(getContext());
                 ContentValues updateValues = new ContentValues();
                 updateValues.put("capture", true);
-                String whereClause = "name = ?";
-                String[] whereArgs = new String[] { pokemon.getName() };
+                String whereClause = "id = ?";
+                String[] whereArgs = new String[] { String.valueOf(pokemon.getId()) };
                 database.update("Pokemon", updateValues, whereClause, whereArgs);
-                // Handle the Pokémon capture logic here
-                // You can update the database or perform any other actions
-                // For example, you can update the "capture" status of the Pokemon
 
                 // After capturing, you might want to navigate back to the previous fragment or activity
                 getActivity().getSupportFragmentManager().popBackStack();
@@ -61,7 +58,6 @@ public class CaptureFragment extends Fragment {
         backButtonMaterial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("PokemonDetailFragment", "Bouton back cliqué"); // Ajoutez cette ligne
                 // Retourner au fragment précédent
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                 fragmentManager.popBackStack();

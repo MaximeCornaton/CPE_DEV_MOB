@@ -124,7 +124,7 @@ public class MapFragment extends Fragment {
         Database db = Database.getInstance(getContext());
 
         // Sélectionnez un Pokémon aléatoire dans la base de données
-        String[] columns = {"ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
+        String[] columns = {"id", "ordre", "name", "capture", "image", "height", "weight", "type1", "type2"};
         Cursor cursor = db.query("Pokemon", columns, null, null, null, null, "RANDOM()");
 
         if (cursor.moveToFirst()) {
@@ -141,6 +141,7 @@ public class MapFragment extends Fragment {
             POKEMON_TYPE enumType1 = POKEMON_TYPE.valueOf(type1);
             POKEMON_TYPE enumType2 = (type2 != null) ? POKEMON_TYPE.valueOf(type2) : null;
             Pokemon pokemon = new Pokemon(ordre, name, frontResource, enumType1, enumType2, weight, height);
+            pokemon.setId(cursor.getInt(cursor.getColumnIndex("id")));
             cursor.close();
             return pokemon;
         }
@@ -193,17 +194,28 @@ public class MapFragment extends Fragment {
             }
             markerPokemonMap = convertedMap;
         }
+        Database database = Database.getInstance(getContext());
         for (Map.Entry<GeoPoint, Pokemon> entry : markerPokemonMap.entrySet()) {
             GeoPoint geoPoint = entry.getKey();
             Pokemon pokemon = entry.getValue();
 
-            // Créer un marqueur à la localisation du GeoPoint
-            Marker marker = new Marker(binding.mapView);
-            marker.setPosition(geoPoint);
-            marker.setIcon(getResources().getDrawable(pokemon.getFrontResource()));
-            marker.setTitle(pokemon.getName());
-            binding.mapView.getOverlays().add(marker);
-            addListenerToMarker(marker, pokemon);
+            String[] columns = {"capture"};
+            String selection = "id = ?";
+            String[] selectionArgs = {String.valueOf(pokemon.getId())};
+            Cursor cursor = database.query("Pokemon", columns, selection, selectionArgs, null, null, null);
+            if (cursor.moveToFirst()) {
+                boolean isCapture = cursor.getInt(cursor.getColumnIndex("capture")) == 1;
+                if (!isCapture) {
+                    Log.d("aaaaaa", "onResume: "+pokemon.getName()+" ;;; "+pokemon.isCapture());
+                    // Créer un marqueur à la localisation du GeoPoint
+                    Marker marker = new Marker(binding.mapView);
+                    marker.setPosition(geoPoint);
+                    marker.setIcon(getResources().getDrawable(pokemon.getFrontResource()));
+                    marker.setTitle(pokemon.getName());
+                    binding.mapView.getOverlays().add(marker);
+                    addListenerToMarker(marker, pokemon);
+                }
+            }
         }
         // Met à jour la carte
         binding.mapView.invalidate();

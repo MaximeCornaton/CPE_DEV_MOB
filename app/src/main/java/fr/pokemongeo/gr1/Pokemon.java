@@ -1,7 +1,9 @@
 package fr.pokemongeo.gr1;
 
 public class Pokemon {
+    private static int lastAssignedId = 0;
     private int order;
+    private int id;
     private boolean capture;
     private String name;
     private double height;
@@ -17,6 +19,7 @@ public class Pokemon {
     }
     public Pokemon(int order, String name, int frontResource,
                    POKEMON_TYPE type1, POKEMON_TYPE type2, double weight, double height) {
+        this.id = lastAssignedId++;
         this.order = order;
         this.capture = false;
         this.name = name;
@@ -80,8 +83,7 @@ public class Pokemon {
     }
     public boolean isCapture() { return capture; }
 
-    public void setCapture(boolean capture) {
-    }
+    public void setCapture(boolean capture) { this.capture = capture; }
 
     @Override
     public String toString() {
@@ -95,5 +97,11 @@ public class Pokemon {
                 ", type1=" + type1 +
                 ", type2=" + type2 +
                 '}';
+    }
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 }

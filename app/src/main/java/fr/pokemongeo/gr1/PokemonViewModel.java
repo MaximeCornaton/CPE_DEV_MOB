@@ -21,6 +21,10 @@ public class PokemonViewModel extends BaseObservable {
         notifyChange();
     }
     @Bindable
+    public String getPokemonId() {
+        return String.valueOf(pokemon.getId());
+    }
+    @Bindable
     public int getFront() {
         return pokemon.getFrontResource();
     }
