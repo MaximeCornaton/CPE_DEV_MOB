@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -20,6 +21,9 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -29,7 +33,17 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +56,7 @@ public class MapFragment extends Fragment {
     private Map<GeoPoint, Pokemon> markerPokemonMap = new HashMap<>();
     private boolean spawnPokemonHandlerPosted = false;
     private final Handler handler = new Handler();
+    private AsyncTask<Void, Void, String> asyncTask;
     private final Runnable spawnPokemonRunnable = new Runnable() {
         @Override
         public void run() {
@@ -84,6 +99,7 @@ public class MapFragment extends Fragment {
                         spawnPokemonHandlerPosted = true;
                         handler.post(spawnPokemonRunnable);
                     }
+                    fetchAndDisplayPointsOfInterest();
                 }
             }
         };
@@ -91,6 +107,94 @@ public class MapFragment extends Fragment {
         binding.mapView.getOverlays().add(myLocationOverlay);
         binding.mapView.getController().setZoom(18);
     }
+
+    private void fetchAndDisplayPointsOfInterest() {
+        // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
+        asyncTask = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    // Requête Overpass.
+                    String overpassQuery = "[out:json];" +
+                            "(node['amenity'='drinking_water']" +
+                            "(around:1000, " + myLocationOverlay.getMyLocation().getLatitude() + ", " + myLocationOverlay.getMyLocation().getLongitude() + ");" +
+                            ");" +
+                            "out;";
+                    URL url = new URL("https://overpass-api.de/api/interpreter");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setDoOutput(true);
+                    OutputStream os = connection.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                    writer.write(overpassQuery);
+                    writer.flush();
+                    writer.close();
+                    os.close();
+
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        InputStream inputStream = connection.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                        StringBuilder response = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
+                        reader.close();
+                        return response.toString();
+                    } else {
+                        // Gérez les erreurs de requête ici.
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String response) {
+                if (response != null) {
+                    parseAndDisplayWaterPoints(response);
+                } else {
+                    // Gérez les erreurs ici.
+                }
+            }
+        }.execute(); // Lancez la tâche AsyncTask.
+    }
+
+
+    private void parseAndDisplayWaterPoints(String overpassResponse) {
+        // Analysez la réponse Overpass pour extraire les coordonnées des points d'eau.
+        // L'analyse dépendra de la structure de la réponse JSON d'Overpass.
+
+        // Exemple (à adapter) : Vous pouvez utiliser une bibliothèque JSON pour extraire les coordonnées des points d'eau.
+        try {
+            JSONObject json = new JSONObject(overpassResponse);
+            JSONArray elements = json.getJSONArray("elements");
+
+            for (int i = 0; i < elements.length(); i++) {
+                JSONObject element = elements.getJSONObject(i);
+                double latitude = element.getDouble("lat");
+                double longitude = element.getDouble("lon");
+
+                // Créez un marqueur pour chaque point d'eau et ajoutez-le à la carte.
+                GeoPoint waterPoint = new GeoPoint(latitude, longitude);
+                Marker waterMarker = new Marker(binding.mapView);
+                waterMarker.setPosition(waterPoint);
+                waterMarker.setIcon(getResources().getDrawable(R.drawable.baseline_my_location_24)); // Utilisez votre propre icône d'eau
+                waterMarker.setTitle("Point d'eau");
+                waterMarker.setSnippet("Description du point d'eau");
+
+                // Ajoutez le marqueur à la carte.
+                binding.mapView.getOverlays().add(waterMarker);
+            }
+
+            binding.mapView.invalidate(); // Rafraîchissez la carte pour afficher les marqueurs.
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public GeoPoint generateRandomLocation(GeoPoint playerLocation, double radius) {
         // Conversion du rayon en degrés de latitude et longitude
@@ -166,6 +270,9 @@ public class MapFragment extends Fragment {
         String json = gson.toJson(markerPokemonMap);
         editor.putString("markerPokemonMap", json);
         editor.apply();
+
+        // Arret du AsyncTask requetant les pokestops
+        asyncTask.cancel(true);
     }
 
     @Override
