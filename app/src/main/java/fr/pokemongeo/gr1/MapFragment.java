@@ -42,7 +42,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,7 +98,7 @@ public class MapFragment extends Fragment {
                         spawnPokemonHandlerPosted = true;
                         handler.post(spawnPokemonRunnable);
                     }
-                    fetchAndDisplayPointsOfInterest();
+                    fetchAndDisplayPointsOfInterest(location);
                 }
             }
         };
@@ -108,7 +107,7 @@ public class MapFragment extends Fragment {
         binding.mapView.getController().setZoom(18);
     }
 
-    private void fetchAndDisplayPointsOfInterest() {
+    private void fetchAndDisplayPointsOfInterest(Location location) {
         // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
         asyncTask = new AsyncTask<Void, Void, String>() {
             @Override
@@ -117,7 +116,7 @@ public class MapFragment extends Fragment {
                     // Requête Overpass.
                     String overpassQuery = "[out:json];" +
                             "(node['amenity'='drinking_water']" +
-                            "(around:1000, " + myLocationOverlay.getMyLocation().getLatitude() + ", " + myLocationOverlay.getMyLocation().getLongitude() + ");" +
+                            "(around:1000, " + location.getLatitude() + ", " + location.getLongitude() + ");" +
                             ");" +
                             "out;";
                     URL url = new URL("https://overpass-api.de/api/interpreter");
@@ -181,9 +180,18 @@ public class MapFragment extends Fragment {
                 GeoPoint waterPoint = new GeoPoint(latitude, longitude);
                 Marker waterMarker = new Marker(binding.mapView);
                 waterMarker.setPosition(waterPoint);
-                waterMarker.setIcon(getResources().getDrawable(R.drawable.baseline_my_location_24)); // Utilisez votre propre icône d'eau
-                waterMarker.setTitle("Point d'eau");
-                waterMarker.setSnippet("Description du point d'eau");
+                waterMarker.setIcon(getResources().getDrawable(R.drawable.baseline_my_location_24));
+                waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+                        PokestopFragment pokestopFragment = new PokestopFragment();
+                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.fragment_container, pokestopFragment);
+                        transaction.addToBackStack(null);
+                        transaction.commit();
+                        return true;
+                    }
+                });
 
                 // Ajoutez le marqueur à la carte.
                 binding.mapView.getOverlays().add(waterMarker);
