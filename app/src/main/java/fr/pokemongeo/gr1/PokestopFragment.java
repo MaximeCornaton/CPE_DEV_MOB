@@ -8,8 +8,13 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.button.MaterialButton;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import fr.pokemongeo.gr1.databinding.PokestopFragmentBinding;
 
@@ -25,22 +30,12 @@ public class PokestopFragment extends Fragment {
                 R.layout.pokestop_fragment, container, false);
         View rootView = binding.getRoot();
 
-        // Button to capture the Pokémon
-        /*Button catchButton = rootView.findViewById(R.id.catchButton);
-        catchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Database database = Database.getInstance(getContext());
-                ContentValues updateValues = new ContentValues();
-                updateValues.put("capture", true);
-                String whereClause = "id = ?";
-                String[] whereArgs = new String[] { String.valueOf(pokemon.getId()) };
-                database.update("Pokemon", updateValues, whereClause, whereArgs);
-
-                // After capturing, you might want to navigate back to the previous fragment or activity
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        });*/
+        // Générer entre 3 et 6 items aléatoirement
+        List<Item> items = generateRandomItems(3, 6);
+        ItemListAdapter adapter = new ItemListAdapter(items);
+        binding.items.setAdapter(adapter);
+        binding.items.setLayoutManager(new LinearLayoutManager(
+                binding.getRoot().getContext()));
 
         MaterialButton backButtonMaterial = rootView.findViewById(R.id.backButton);
         // Ajouter un listener de clic au bouton
@@ -54,5 +49,22 @@ public class PokestopFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    private List<Item> generateRandomItems(int minCount, int maxCount) {
+        Random random = new Random();
+        int itemCount = random.nextInt(maxCount - minCount + 1) + minCount; // Générer un nombre entre minCount et maxCount inclus
+        List<Item> items = new ArrayList<>();
+
+        for (int i = 0; i < itemCount; i++) {
+            // Générer aléatoirement un type d'item (pokeball ou potion)
+            if (random.nextBoolean()) {
+                items.add(new Ball("Pokeball", "description", 1, 50));
+            } else {
+                items.add(new Potion("Potion", "description", 1, 50));
+            }
+        }
+
+        return items;
     }
 }

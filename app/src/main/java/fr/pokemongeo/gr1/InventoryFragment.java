@@ -27,8 +27,8 @@ public class InventoryFragment extends Fragment {
                 R.layout.inventory_fragment,container,false);
 
         List<Item> itemList = getAllItemsFromDatabase();
-        itemList.add(new Potion("Potion", "potion", "Restaure 20 PV", 3, 20));
-        itemList.add(new Potion("Super Potion", "super_potion", "Restaure 50 PV", 1, 50));
+        itemList.add(new Potion("Potion", "Restaure 20 PV", 3, 20));
+        itemList.add(new Potion("Super Potion", "Restaure 50 PV", 1, 50));
 
         ItemListAdapter adapter = new ItemListAdapter(itemList);
 
@@ -56,9 +56,9 @@ public class InventoryFragment extends Fragment {
                 // Créez l'instance appropriée en fonction du type d'item
                 Item item;
                 if ("pokeball".equals(itemType)) {
-                    item = new Ball(name, image, description, quantity);
+                    item = new Ball(name, description, quantity, 50);
                 } else {
-                    item = new Potion(name, image, description, quantity);
+                    item = new Potion(name, description, quantity, 50);
                 }
 
                 itemList.add(item);

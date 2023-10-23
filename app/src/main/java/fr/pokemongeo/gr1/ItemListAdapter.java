@@ -6,9 +6,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import fr.pokemongeo.gr1.databinding.ItemItemBinding;
 
 public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemViewHolder> {
 
@@ -21,16 +24,16 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_item, parent, false);
-        return new ItemViewHolder(view);
+        ItemItemBinding binding = DataBindingUtil.inflate(
+                LayoutInflater.from(parent.getContext()),
+                R.layout.item_item, parent, false);
+        return new ItemViewHolder(binding);
     }
-
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         Item item = itemList.get(position);
-        holder.itemName.setText(item.getName());
-        holder.itemDescription.setText(item.getDescription());
-        holder.itemCount.setText(String.valueOf(item.getQuantity()));
+        holder.binding.itemImage.setImageDrawable(holder.viewModel.getImage(holder.itemView.getContext(), item.getFront()));
+        holder.viewModel.setItem(item);
     }
 
     @Override
@@ -39,16 +42,12 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
     }
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
-        TextView itemName;
-        TextView itemDescription;
-
-        TextView itemCount;
-
-        public ItemViewHolder(@NonNull View itemView) {
-            super(itemView);
-            itemName = itemView.findViewById(R.id.itemName);
-            itemDescription = itemView.findViewById(R.id.itemDescription);
-            itemCount = itemView.findViewById(R.id.itemCount);
+        private ItemItemBinding binding;
+        private ItemViewModel viewModel = new ItemViewModel();
+        public ItemViewHolder(ItemItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            this.binding.setItemViewModel(viewModel);
         }
     }
 }

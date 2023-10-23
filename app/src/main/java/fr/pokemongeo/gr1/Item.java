@@ -1,5 +1,6 @@
 package fr.pokemongeo.gr1;
 
+
 public abstract class Item {
     private String name;
     private String image;
@@ -17,8 +18,11 @@ public abstract class Item {
         return name;
     }
 
-    public String getImage() {
+    public String getFront() {
         return image;
+    }
+    public void setFront(String image) {
+        this.image = image;
     }
 
     public String getDescription() {
@@ -31,10 +35,6 @@ public abstract class Item {
 
     public void setName(String name) {
         this.name= name;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public void setDescription(String description) {

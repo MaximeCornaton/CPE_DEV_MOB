@@ -3,13 +3,9 @@ package fr.pokemongeo.gr1;
 public class Ball extends Item {
     private int catchRate;
 
-    public Ball(String name, String image, String description, int quantity, int catchRate) {
-        super(name, image, description, quantity);
+    public Ball(String name, String description, int quantity, int catchRate) {
+        super(name, "baseline_catching_pokemon_24", description, quantity);
         this.catchRate = catchRate;
-    }
-    public Ball(String name, String image, String description, int quantity) {
-        super(name, image, description, quantity);
-        this.catchRate = 0;
     }
 
     public int getCatchRate() {

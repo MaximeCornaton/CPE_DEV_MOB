@@ -2,6 +2,7 @@
 Table Pokemon :
 
 ID (clé primaire)
+ordre (int)
 Capturé (bool)
 Nom du Pokémon
 Nom de l'image
@@ -11,7 +12,7 @@ Height
 Weight
 
 ----
-Table Joueur :
+Table Items :
 
 ID (clé primaire)
 Nom du joueur

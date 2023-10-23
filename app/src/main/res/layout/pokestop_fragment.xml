@@ -41,5 +41,17 @@ tools:context=".PokestopFragment">
         android:src="@drawable/pokestop"
         android:scaleType="fitCenter" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:layout_constraintTop_toBottomOf="@+id/pokestopImage"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
 </RelativeLayout>
 </layout>
