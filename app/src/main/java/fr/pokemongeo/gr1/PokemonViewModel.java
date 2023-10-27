@@ -7,12 +7,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
-import org.osmdroid.views.overlay.Marker;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import fr.pokemongeo.gr1.Pokemon;
 
 public class PokemonViewModel extends BaseObservable {
     private Pokemon pokemon;

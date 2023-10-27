@@ -1,0 +1,9 @@
+pipeline:
+  build:
+    image: eclipse-temurin:11
+    commands:
+      - bash ./gradlew assembleDebug
+    environment:
+      - ANDROID_HOME=/mnt/sdk
+    volumes:
+      - /home/woodpecker/sdk:/mnt/sdk

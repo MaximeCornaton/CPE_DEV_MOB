@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +49,7 @@ public class Database {
         return rowsUpdated;
     }
 
-    void loadPokemonFromJSON(Context context) {
+    public void loadPokemonFromJSON(Context context) {
         if (!hasDataLoaded(context)) {
             // Ouverture du fichier dans assets
             InputStreamReader isr;

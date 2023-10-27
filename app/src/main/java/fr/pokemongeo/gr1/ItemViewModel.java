@@ -2,11 +2,12 @@ package fr.pokemongeo.gr1;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+
+import fr.pokemongeo.gr1.Item;
 
 public class ItemViewModel extends BaseObservable {
     private Item item;

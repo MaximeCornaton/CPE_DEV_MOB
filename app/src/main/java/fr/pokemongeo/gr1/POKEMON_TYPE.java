@@ -1,6 +1,6 @@
 package fr.pokemongeo.gr1;
 
-enum POKEMON_TYPE {
+public enum POKEMON_TYPE {
     Acier,
     Combat,
     Dragon,

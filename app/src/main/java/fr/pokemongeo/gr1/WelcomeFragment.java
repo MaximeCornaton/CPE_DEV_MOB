@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import fr.pokemongeo.gr1.MainActivity;
+import fr.pokemongeo.gr1.R;
+
 public class WelcomeFragment extends Fragment {
 
     @Nullable
