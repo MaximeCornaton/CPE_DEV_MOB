@@ -9,35 +9,34 @@
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="#FFFFFF"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/Image"
-        android:layout_width="250dp"
-        android:layout_height="234dp"
-        android:layout_marginTop="24dp"
-    android:src="@{pokemonViewModel.getImage(context, pokemonViewModel.front)}"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/Image"
+            android:layout_width="250dp"
+            android:layout_height="234dp"
+            android:layout_marginTop="24dp"
+            android:src="@{pokemonViewModel.getImage(context, pokemonViewModel.front)}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-    <TextView
-        android:id="@+id/Nom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@{pokemonViewModel.name}"
-        android:textSize="30sp"
-    android:textAlignment="center"
-    app:layout_constraintTop_toBottomOf="@+id/Image"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="16dp"
-    android:textStyle="bold"
-    android:textColor="#000000"
-    />
+        <TextView
+            android:id="@+id/Nom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{pokemonViewModel.name}"
+            android:textSize="30sp"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@+id/Image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
 
         <TextView
             android:id="@+id/Type1"
@@ -48,6 +47,7 @@
             android:textColor="#007AFF"
             android:textSize="25sp"
             android:textStyle="italic"
+            android:layout_marginStart="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/Nom" />
 
@@ -60,30 +60,55 @@
             android:textColor="#007AFF"
             android:textSize="25sp"
             android:textStyle="italic"
+            android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/Nom" />
+
+        <TextView
+            android:id="@+id/LabelWeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="Weight:"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Type2" />
+
+        <TextView
+            android:id="@+id/Poids"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{pokemonViewModel.weight}"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/LabelWeight" />
 
         <TextView
             android:id="@+id/Taille"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:text="@{pokemonViewModel.height}"
             android:textSize="25sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Type1" />
+            app:layout_constraintTop_toBottomOf="@id/LabelHeight" />
 
-    <TextView
-        android:id="@+id/Poids"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@{pokemonViewModel.weight}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Type2"
-        android:layout_marginEnd="16dp"
-        android:textSize="25sp"
-    android:textStyle="bold"
-    />
+        <TextView
+            android:id="@+id/LabelHeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Height:"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/Type1" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/backButton"
@@ -97,22 +122,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/Nombre"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@{pokemonViewModel.number}"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:textSize="25sp"
-    android:layout_marginEnd="16dp"
-    android:textStyle="bold"
-    android:textColor="#007AFF"
-    />
-
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-    </layout>
+        <TextView
+            android:id="@+id/Nombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{pokemonViewModel.number}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:textSize="25sp"
+            android:layout_marginEnd="16dp"
+            android:textStyle="bold"
+            android:textColor="#007AFF"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
