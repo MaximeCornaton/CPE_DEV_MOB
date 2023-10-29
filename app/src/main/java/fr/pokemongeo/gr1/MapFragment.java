@@ -56,6 +56,7 @@ public class MapFragment extends Fragment {
     private boolean spawnPokemonHandlerPosted = false;
     private final Handler handler = new Handler();
     private AsyncTask<Void, Void, String> asyncTask;
+    private Location oldLocation = new Location("");
     private final Runnable spawnPokemonRunnable = new Runnable() {
         @Override
         public void run() {
@@ -75,10 +76,10 @@ public class MapFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = MapFragmentBinding.inflate(inflater, container, false);
+        oldLocation = new Location("");
         View rootView = binding.getRoot();
         Context context = rootView.getContext();
         Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
-
         return rootView;
     }
 
@@ -98,7 +99,11 @@ public class MapFragment extends Fragment {
                         spawnPokemonHandlerPosted = true;
                         handler.post(spawnPokemonRunnable);
                     }
-                    fetchAndDisplayPointsOfInterest(location);
+                    if (location.distanceTo(oldLocation) > 10) {
+                        Log.d("QQQQQQ", "onLocationChanged: ");
+                        fetchAndDisplayPointsOfInterest(location);
+                        oldLocation = location;
+                    }
                 }
             }
         };
@@ -108,6 +113,9 @@ public class MapFragment extends Fragment {
     }
 
     private void fetchAndDisplayPointsOfInterest(Location location) {
+        if (binding.mapView == null) {
+            return;
+        }
         // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
         asyncTask = new AsyncTask<Void, Void, String>() {
             @Override
@@ -153,6 +161,10 @@ public class MapFragment extends Fragment {
             @Override
             protected void onPostExecute(String response) {
                 if (response != null) {
+                    if (binding.mapView == null) {
+                        // La vue de la carte n'est pas encore initialisée, donc on ne fait rien
+                        return;
+                    }
                     parseAndDisplayWaterPoints(response);
                 } else {
                     // Gérez les erreurs ici.
@@ -163,10 +175,7 @@ public class MapFragment extends Fragment {
 
 
     private void parseAndDisplayWaterPoints(String overpassResponse) {
-        // Analysez la réponse Overpass pour extraire les coordonnées des points d'eau.
-        // L'analyse dépendra de la structure de la réponse JSON d'Overpass.
-
-        // Exemple (à adapter) : Vous pouvez utiliser une bibliothèque JSON pour extraire les coordonnées des points d'eau.
+        Log.d("SSSSS", "parseAndDisplayWaterPoints: " + binding.mapView);
         try {
             JSONObject json = new JSONObject(overpassResponse);
             JSONArray elements = json.getJSONArray("elements");
@@ -248,7 +257,6 @@ public class MapFragment extends Fragment {
             double weight = cursor.getDouble(cursor.getColumnIndex("weight"));
             String type1 = cursor.getString(cursor.getColumnIndex("type1"));
             String type2 = cursor.getString(cursor.getColumnIndex("type2"));
-            boolean isCapture = cursor.getInt(cursor.getColumnIndex("capture")) == 1;
 
             POKEMON_TYPE enumType1 = POKEMON_TYPE.valueOf(type1);
             POKEMON_TYPE enumType2 = (type2 != null) ? POKEMON_TYPE.valueOf(type2) : null;

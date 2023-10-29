@@ -34,8 +34,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="32dp"
             android:text="@{pokemonViewModel.name}"
-            android:textSize="18sp"
-            android:textColor="#000000" />
+            android:textColor="#000000"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/id"
@@ -43,32 +43,69 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:text="@{pokemonViewModel.pokemonId}"
-            android:textSize="18sp"
-            android:textColor="#000000" />
+            android:textColor="#000000"
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/pokemonImageView"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:layout_centerHorizontal="true"
             android:layout_below="@+id/pokemonName"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
-            android:src="@{pokemonViewModel.getImage(context, pokemonViewModel.front)}"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:src="@{pokemonViewModel.getImage(context, pokemonViewModel.front)}" />
 
-
-        <Button
-            android:id="@+id/catchButton"
+        <TextView
+            android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/pokemonImageView"
             android:layout_marginTop="16dp"
-            android:text="Catch"
-            android:textSize="18sp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:textColor="#FFFFFF" />
+            android:text="Catch with :"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/bottomButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/pokeballButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Pokeball"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/superballButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Superball"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/hyperballButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Hyperball"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+        </LinearLayout>
 
     </RelativeLayout>
 </layout>
