@@ -100,7 +100,6 @@ public class MapFragment extends Fragment {
                         handler.post(spawnPokemonRunnable);
                     }
                     if (location.distanceTo(oldLocation) > 10) {
-                        Log.d("QQQQQQ", "onLocationChanged: ");
                         fetchAndDisplayPointsOfInterest(location);
                         oldLocation = location;
                     }
@@ -113,9 +112,6 @@ public class MapFragment extends Fragment {
     }
 
     private void fetchAndDisplayPointsOfInterest(Location location) {
-        if (binding.mapView == null) {
-            return;
-        }
         // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
         asyncTask = new AsyncTask<Void, Void, String>() {
             @Override
@@ -161,10 +157,6 @@ public class MapFragment extends Fragment {
             @Override
             protected void onPostExecute(String response) {
                 if (response != null) {
-                    if (binding.mapView == null) {
-                        // La vue de la carte n'est pas encore initialisée, donc on ne fait rien
-                        return;
-                    }
                     parseAndDisplayWaterPoints(response);
                 } else {
                     // Gérez les erreurs ici.
@@ -175,7 +167,6 @@ public class MapFragment extends Fragment {
 
 
     private void parseAndDisplayWaterPoints(String overpassResponse) {
-        Log.d("SSSSS", "parseAndDisplayWaterPoints: " + binding.mapView);
         try {
             JSONObject json = new JSONObject(overpassResponse);
             JSONArray elements = json.getJSONArray("elements");
@@ -288,7 +279,9 @@ public class MapFragment extends Fragment {
         editor.apply();
 
         // Arret du AsyncTask requetant les pokestops
-        asyncTask.cancel(true);
+        if (asyncTask != null) {
+            asyncTask.cancel(true);
+        }
     }
 
     @Override
@@ -329,7 +322,6 @@ public class MapFragment extends Fragment {
             if (cursor.moveToFirst()) {
                 boolean isCapture = cursor.getInt(cursor.getColumnIndex("capture")) == 1;
                 if (!isCapture) {
-                    Log.d("aaaaaa", "onResume: "+pokemon.getName()+" ;;; "+pokemon.isCapture());
                     // Créer un marqueur à la localisation du GeoPoint
                     Marker marker = new Marker(binding.mapView);
                     marker.setPosition(geoPoint);
