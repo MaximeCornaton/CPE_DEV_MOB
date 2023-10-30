@@ -100,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        PokedexFragment fragment = new PokedexFragment();
-        fragment.setOnClickOnNoteListener(listener);
+        MapFragment fragment = new MapFragment();
         transaction.replace(R.id.fragment_container,fragment);
         transaction.commit();
     }
@@ -112,16 +111,16 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment fragment;
             if (item.getItemId() == R.id.page_1) {
-                fragment = new PokedexFragment();
-                ((PokedexFragment) fragment).setOnClickOnNoteListener(listener);
-                replaceFragment(fragment);
-                return true;
-            }
-            if (item.getItemId() == R.id.page_2) {
                 if (mapFragment == null) {
                     mapFragment = new MapFragment();
                 }
                 replaceFragment(mapFragment);
+                return true;
+            }
+            if (item.getItemId() == R.id.page_2) {
+                fragment = new PokedexFragment();
+                ((PokedexFragment) fragment).setOnClickOnNoteListener(listener);
+                replaceFragment(fragment);
                 return true;
             }
             if (item.getItemId() == R.id.page_3) {
