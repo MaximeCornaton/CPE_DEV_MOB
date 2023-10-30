@@ -109,9 +109,9 @@ public class Database {
         createItem(context,"Potion","potion", "Donne 50PV supplémentaires à un pokémon", 0);
         createItem(context,"Super Potion","potion","Donne 100PV supplémentaires à un pokémon", 0);
         createItem(context,"Hyper Potion","potion", "Donne 150PV supplémentaires à un pokémon", 0);
-        createItem(context,"Pokeball","pokeball", "Donne 60% de chance d'attraper le pokémon", 0);
-        createItem(context,"Superball","pokeball", "Donne 80% de chance d'attraper le pokémon", 0);
-        createItem(context,"Hyperball","pokeball", "Donne 95% de chance d'attraper le pokémon", 0);
+        createItem(context,"Pokeball","pokeball", "Donne 50% de chance d'attraper le pokémon", 0);
+        createItem(context,"Superball","pokeball", "Donne 75% de chance d'attraper le pokémon", 0);
+        createItem(context,"Hyperball","pokeball", "Donne 90% de chance d'attraper le pokémon", 0);
     }
     public void createItem(Context context, String name, String itemType, String description, int quantity) {
         ContentValues values = new ContentValues();

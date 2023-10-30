@@ -1,8 +1,11 @@
 package fr.pokemongeo.gr1;
 
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.osmdroid.util.GeoPoint;
+
+import java.lang.reflect.Type;
+import java.util.Iterator;
+import java.util.Map;
 
 import fr.pokemongeo.gr1.databinding.CaptureFragmentBinding;
 
@@ -43,10 +54,19 @@ public class CaptureFragment extends Fragment {
             public void onClick(View v) {
                 int pokeballQuantity = getBalls("Pokeball");
                 if (pokeballQuantity > 0) {
-                    catchPokemon("Pokeball", pokeballQuantity);
+                    if (attemptCapture(50)) {
+                        catchPokemon("Pokeball", pokeballQuantity);
+                        Toast.makeText(getContext(), "Gotcha !", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        removePokemonMarker(pokemon);
+                        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                        fragmentManager.popBackStack();
+                        Toast.makeText(getContext(), "Oh no ! The Pokemon broke free !", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else {
-                    Toast.makeText(getContext(), "You're out of Pokeball", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Out of Pokeball", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -55,10 +75,19 @@ public class CaptureFragment extends Fragment {
             public void onClick(View v) {
                 int superballQuantity = getBalls("Superball");
                 if (superballQuantity > 0) {
-                    catchPokemon("Superball", superballQuantity);
+                    if (attemptCapture(75)) {
+                        catchPokemon("Superball", superballQuantity);
+                        Toast.makeText(getContext(), "Gotcha !", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        removePokemonMarker(pokemon);
+                        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                        fragmentManager.popBackStack();
+                        Toast.makeText(getContext(), "Oh no ! The Pokemon broke free !", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else {
-                    Toast.makeText(getContext(), "You're out of Superball", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Out of Superball", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -67,10 +96,19 @@ public class CaptureFragment extends Fragment {
             public void onClick(View v) {
                 int hyperballQuantity = getBalls("Hyperball");
                 if (hyperballQuantity > 0) {
-                    catchPokemon("Hyperball", hyperballQuantity);
+                    if (attemptCapture(90)) {
+                        catchPokemon("Superball", hyperballQuantity);
+                        Toast.makeText(getContext(), "Gotcha !", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        removePokemonMarker(pokemon);
+                        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                        fragmentManager.popBackStack();
+                        Toast.makeText(getContext(), "Oh no ! The Pokemon broke free !", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else {
-                    Toast.makeText(getContext(), "You're out of Hyperball", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Out of Hyperball", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -87,6 +125,42 @@ public class CaptureFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    private void removePokemonMarker(Pokemon pokemon) {
+        // Restaure markerPokemonMap depuis les préférences partagées
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        String json = preferences.getString("markerPokemonMap", null);
+
+        if (json != null) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<Map<String, Pokemon>>() {
+            }.getType();
+            Map<String, Pokemon> mapFromJson = gson.fromJson(json, type);
+
+            for (Map.Entry<String, Pokemon> entry : mapFromJson.entrySet()) {
+                Pokemon pokemonPref = entry.getValue();
+                if (pokemonPref.getId() == pokemon.getId()) {
+                    mapFromJson.remove(entry.getKey());
+                    break;
+                }
+            }
+
+            // Convertir la carte mise à jour en JSON
+            String updatedJson = gson.toJson(mapFromJson);
+
+            // Mettez à jour les préférences partagées avec la nouvelle carte
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("markerPokemonMap", updatedJson);
+            editor.apply();
+        }
+    }
+
+
+
+    private boolean attemptCapture(int i) {
+        double random = Math.random() * 100;
+        return random <= i;
     }
 
     private void catchPokemon(String ballType, int ballQuantity) {

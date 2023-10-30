@@ -297,6 +297,7 @@ public class MapFragment extends Fragment {
         String json = preferences.getString("markerPokemonMap", null);
 
         if (json != null) {
+            Log.d("ABCDEF", "onResume: "+json);
             Gson gson = new Gson();
             Type type = new TypeToken<Map<String, Pokemon>>() {
             }.getType();
