@@ -111,97 +111,98 @@ public class MapFragment extends Fragment {
         binding.mapView.getController().setZoom(18);
     }
 
-    private void fetchAndDisplayPointsOfInterest(Location location) {
-        // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
-        asyncTask = new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                try {
-                    // Requête Overpass.
-                    String overpassQuery = "[out:json];" +
-                            "(node['amenity'='drinking_water']" +
-                            "(around:1000, " + location.getLatitude() + ", " + location.getLongitude() + ");" +
-                            ");" +
-                            "out;";
-                    URL url = new URL("https://overpass-api.de/api/interpreter");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("POST");
-                    connection.setDoOutput(true);
-                    OutputStream os = connection.getOutputStream();
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                    writer.write(overpassQuery);
-                    writer.flush();
-                    writer.close();
-                    os.close();
+        private void fetchAndDisplayPointsOfInterest(Location location) {
+            // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
+            asyncTask = new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... params) {
+                    try {
+                        // Requête Overpass.
+                        String overpassQuery = "[out:json];" +
+                                "(node['amenity'='drinking_water']" +
+                                "(around:1000, " + location.getLatitude() + ", " + location.getLongitude() + ");" +
+                                ");" +
+                                "out;";
+                        URL url = new URL("https://overpass-api.de/api/interpreter");
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("POST");
+                        connection.setDoOutput(true);
+                        OutputStream os = connection.getOutputStream();
+                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                        writer.write(overpassQuery);
+                        writer.flush();
+                        writer.close();
+                        os.close();
 
-                    int responseCode = connection.getResponseCode();
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        InputStream inputStream = connection.getInputStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                        StringBuilder response = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            response.append(line);
+                        int responseCode = connection.getResponseCode();
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            InputStream inputStream = connection.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                            StringBuilder response = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
+                            }
+                            reader.close();
+                            return response.toString();
+                        } else {
+                            // Gérez les erreurs de requête ici.
                         }
-                        reader.close();
-                        return response.toString();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(String response) {
+                    if (response != null) {
+                        parseAndDisplayWaterPoints(response);
                     } else {
-                        // Gérez les erreurs de requête ici.
+                        // Gérez les erreurs ici.
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(String response) {
-                if (response != null) {
-                    parseAndDisplayWaterPoints(response);
-                } else {
-                    // Gérez les erreurs ici.
-                }
-            }
-        }.execute(); // Lancez la tâche AsyncTask.
-    }
-
-
-    private void parseAndDisplayWaterPoints(String overpassResponse) {
-        try {
-            JSONObject json = new JSONObject(overpassResponse);
-            JSONArray elements = json.getJSONArray("elements");
-
-            for (int i = 0; i < elements.length(); i++) {
-                JSONObject element = elements.getJSONObject(i);
-                double latitude = element.getDouble("lat");
-                double longitude = element.getDouble("lon");
-
-                // Créez un marqueur pour chaque point d'eau et ajoutez-le à la carte.
-                GeoPoint waterPoint = new GeoPoint(latitude, longitude);
-                Marker waterMarker = new Marker(binding.mapView);
-                waterMarker.setPosition(waterPoint);
-                waterMarker.setIcon(getResources().getDrawable(R.drawable.baseline_my_location_24));
-                waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(Marker marker, MapView mapView) {
-                        PokestopFragment pokestopFragment = new PokestopFragment();
-                        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.fragment_container, pokestopFragment);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
-                        return true;
-                    }
-                });
-
-                // Ajoutez le marqueur à la carte.
-                binding.mapView.getOverlays().add(waterMarker);
-            }
-
-            binding.mapView.invalidate(); // Rafraîchissez la carte pour afficher les marqueurs.
-        } catch (JSONException e) {
-            e.printStackTrace();
+            }.execute(); // Lancez la tâche AsyncTask.
         }
-    }
+
+
+        private void parseAndDisplayWaterPoints(String overpassResponse) {
+            try {
+                JSONObject json = new JSONObject(overpassResponse);
+                JSONArray elements = json.getJSONArray("elements");
+
+                for (int i = 0; i < elements.length(); i++) {
+                    JSONObject element = elements.getJSONObject(i);
+                    double latitude = element.getDouble("lat");
+                    double longitude = element.getDouble("lon");
+
+                    // Créez un marqueur pour chaque point d'eau et ajoutez-le à la carte.
+                    GeoPoint waterPoint = new GeoPoint(latitude, longitude);
+                    Marker waterMarker = new Marker(binding.mapView);
+                    waterMarker.setPosition(waterPoint);
+                    waterMarker.setIcon(getResources().getDrawable(R.drawable.baseline_my_location_24));
+                    waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker, MapView mapView) {
+                            PokestopFragment pokestopFragment = new PokestopFragment();
+                            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            transaction.replace(R.id.fragment_container, pokestopFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+                            return true;
+                        }
+                    });
+
+                    // Ajoutez le marqueur à la carte.
+                    binding.mapView.getOverlays().add(waterMarker);
+                }
+
+                binding.mapView.invalidate(); // Rafraîchissez la carte pour afficher les marqueurs.
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("JSON Parsing", "Erreur lors de l'analyse JSON.");
+            }
+        }
 
 
     public GeoPoint generateRandomLocation(GeoPoint playerLocation, double radius) {

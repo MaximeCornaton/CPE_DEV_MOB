@@ -1,6 +1,7 @@
 package fr.pokemongeo.gr1;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
@@ -11,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -46,13 +48,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-            ActivityCompat.requestPermissions(this, permissions, 1);
-        } else {
-            setupLocation();
-        }
-
         myLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location newLocation) {}
@@ -63,6 +58,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {}
         };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        } else {
+            setupLocation();
+        }
 
         if (isFirstLaunch()) {
             // First app launch, show the WelcomeFragment
@@ -166,13 +168,35 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, you can now call setupLocation
-                Log.d("XXXX", "onRequestPermissionsResult");
+                // Permission granted
                 setupLocation();
             } else {
-                // Permission denied, you may want to show an error message
+                // Permission denied
+                showExplanationDialog();
             }
         }
+    }
+
+    private void showExplanationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Location required");
+        builder.setMessage("To use this application, you must grant localization permission..");
+        builder.setPositiveButton("Grant permission", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Redemander la permission de localisation.
+                String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+                ActivityCompat.requestPermissions(MainActivity.this , permissions, 1);
+            }
+        });
+        builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Quitter l'application
+                finish();
+            }
+        });
+        builder.show();
     }
 
     private void setupLocation() {
