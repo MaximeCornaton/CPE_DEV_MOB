@@ -55,7 +55,8 @@ public class MapFragment extends Fragment {
     private Map<GeoPoint, Pokemon> markerPokemonMap = new HashMap<>();
     private boolean spawnPokemonHandlerPosted = false;
     private final Handler handler = new Handler();
-    private AsyncTask<Void, Void, String> asyncTask;
+    private AsyncTask<Void, Void, String> asyncTaskPokestops;
+    private AsyncTask<Void, Void, String> asyncTaskArenas;
     private Location oldLocation = new Location("");
     private final Runnable spawnPokemonRunnable = new Runnable() {
         @Override
@@ -112,15 +113,15 @@ public class MapFragment extends Fragment {
     }
 
         private void fetchPointsOfInterest(Location location) {
-            // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
-            asyncTask = new AsyncTask<Void, Void, String>() {
+            // AsyncTasks pour effectuer les requêtes Overpass de manière asynchrone.
+            asyncTaskPokestops = new AsyncTask<Void, Void, String>() {
                 @Override
                 protected String doInBackground(Void... params) {
                     try {
                         // Requête Overpass.
                         String overpassQuery = "[out:json];" +
                                 "(node['amenity'='drinking_water']" +
-                                "(around:1000, " + location.getLatitude() + ", " + location.getLongitude() + ");" +
+                                "(around:500, " + location.getLatitude() + ", " + location.getLongitude() + ");" +
                                 ");" +
                                 "out;";
                         URL url = new URL("https://overpass-api.de/api/interpreter");
@@ -163,6 +164,56 @@ public class MapFragment extends Fragment {
                     }
                 }
             }.execute(); // Lancez la tâche AsyncTask.
+            asyncTaskArenas = new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... params) {
+                    try {
+                        // Requête Overpass.
+                        String overpassQuery = "[out:json];" +
+                                "(node['amenity'='restaurant']" +
+                                "(around:500, " + location.getLatitude() + ", " + location.getLongitude() + ");" +
+                                ");" +
+                                "out;";
+                        URL url = new URL("https://overpass-api.de/api/interpreter");
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("POST");
+                        connection.setDoOutput(true);
+                        OutputStream os = connection.getOutputStream();
+                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                        writer.write(overpassQuery);
+                        writer.flush();
+                        writer.close();
+                        os.close();
+
+                        int responseCode = connection.getResponseCode();
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            InputStream inputStream = connection.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                            StringBuilder response = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
+                            }
+                            reader.close();
+                            return response.toString();
+                        } else {
+                            // Gérez les erreurs de requête ici.
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(String response) {
+                    if (response != null) {
+                        parseAndDisplayPokemonArenas(response);
+                    } else {
+                        // Gérez les erreurs ici.
+                    }
+                }
+            }.execute(); // Lancez la tâche AsyncTask.
         }
 
         private void parseAndDisplayPokemonArenas(String overpassResponse) {
@@ -175,16 +226,14 @@ public class MapFragment extends Fragment {
                     double latitude = element.getDouble("lat");
                     double longitude = element.getDouble("lon");
 
-                    // Create a marker for each Pokémon arena and add it to the map.
-                    GeoPoint arenaLocation = new GeoPoint(latitude, longitude);
-                    Marker arenaMarker = new Marker(binding.mapView);
-                    arenaMarker.setPosition(arenaLocation);
-                    arenaMarker.setIcon(getResources().getDrawable(R.drawable.arena));
-                    arenaMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    // Créer un marqueur pour chaque restaurant et l'ajouter à la carte.
+                    GeoPoint waterPoint = new GeoPoint(latitude, longitude);
+                    Marker waterMarker = new Marker(binding.mapView);
+                    waterMarker.setPosition(waterPoint);
+                    waterMarker.setIcon(getResources().getDrawable(R.drawable.arena));
+                    waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker, MapView mapView) {
-                            // Handle interaction with the Pokémon arena.
-                            // You can trigger a battle or other actions here.
                             ArenaFragment arenaFragment = new ArenaFragment();
                             FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                             transaction.replace(R.id.fragment_container, arenaFragment);
@@ -194,14 +243,14 @@ public class MapFragment extends Fragment {
                         }
                     });
 
-                    // Add the marker to the map.
-                    binding.mapView.getOverlays().add(arenaMarker);
+                    // Ajoutez le marqueur à la carte.
+                    binding.mapView.getOverlays().add(waterMarker);
                 }
 
-                binding.mapView.invalidate(); // Refresh the map to display the markers.
+                binding.mapView.invalidate(); // Rafraîchissez la carte pour afficher les marqueurs.
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.e("JSON Parsing", "Error parsing JSON.");
+                Log.e("JSON Parsing", "Erreur lors de l'analyse JSON.");
             }
         }
 
@@ -319,8 +368,11 @@ public class MapFragment extends Fragment {
         editor.apply();
 
         // Arret du AsyncTask requetant les pokestops
-        if (asyncTask != null) {
-            asyncTask.cancel(true);
+        if (asyncTaskPokestops != null) {
+            asyncTaskPokestops.cancel(true);
+        }
+        if (asyncTaskArenas != null) {
+            asyncTaskArenas.cancel(true);
         }
     }
 

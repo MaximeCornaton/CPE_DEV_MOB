@@ -29,7 +29,7 @@ public class ArenaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater,
-                R.layout.pokestop_fragment, container, false);
+                R.layout.arena_fragment, container, false);
         View rootView = binding.getRoot();
 
 
