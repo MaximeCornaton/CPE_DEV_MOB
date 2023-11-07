@@ -100,7 +100,7 @@ public class MapFragment extends Fragment {
                         handler.post(spawnPokemonRunnable);
                     }
                     if (location.distanceTo(oldLocation) > 10) {
-                        fetchAndDisplayPointsOfInterest(location);
+                        fetchPointsOfInterest(location);
                         oldLocation = location;
                     }
                 }
@@ -111,7 +111,7 @@ public class MapFragment extends Fragment {
         binding.mapView.getController().setZoom(18);
     }
 
-        private void fetchAndDisplayPointsOfInterest(Location location) {
+        private void fetchPointsOfInterest(Location location) {
             // AsyncTask pour effectuer la requête Overpass de manière asynchrone.
             asyncTask = new AsyncTask<Void, Void, String>() {
                 @Override
