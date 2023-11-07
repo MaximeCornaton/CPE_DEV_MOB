@@ -41,6 +41,16 @@ tools:context=".ArenaFragment">
         android:src="@drawable/arena"
         android:scaleType="fitCenter" />
 
+    <Button
+        android:id="@+id/captureButton"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/arenaImage"
+        android:text="Capture"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
 
 
 </RelativeLayout>

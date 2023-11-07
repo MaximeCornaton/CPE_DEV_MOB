@@ -27,8 +27,17 @@ public class ArenaFragment extends Fragment {
 
 
         MaterialButton backButtonMaterial = rootView.findViewById(R.id.backButton);
+        MaterialButton captureButtonMaterial = rootView.findViewById(R.id.captureButton);
         // Ajouter un listener de clic au bouton
         backButtonMaterial.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Retourner au fragment précédent
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.popBackStack();
+            }
+        });
+        captureButtonMaterial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Retourner au fragment précédent

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
@@ -57,6 +58,7 @@ public class MapFragment extends Fragment {
     private final Handler handler = new Handler();
     private AsyncTask<Void, Void, String> asyncTaskPokestops;
     private AsyncTask<Void, Void, String> asyncTaskArenas;
+    private Map<GeoPoint, Long> markerTimestamps = new HashMap<>();
     private Location oldLocation = new Location("");
     private final Runnable spawnPokemonRunnable = new Runnable() {
         @Override
@@ -272,11 +274,16 @@ public class MapFragment extends Fragment {
                     waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker, MapView mapView) {
-                            PokestopFragment pokestopFragment = new PokestopFragment();
-                            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.fragment_container, pokestopFragment);
-                            transaction.addToBackStack(null);
-                            transaction.commit();
+                            if (getTimeSinceLastOpen(waterPoint) >= 120) {
+                                PokestopFragment pokestopFragment = new PokestopFragment();
+                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.fragment_container, pokestopFragment);
+                                transaction.addToBackStack(null);
+                                transaction.commit();
+                                updateMarkerTimestamp(waterPoint);
+                            } else {
+                                Toast.makeText(getContext(), "Come back in "+ (120 - getTimeSinceLastOpen(waterPoint)) +" seconds !", Toast.LENGTH_SHORT).show();
+                            }
                             return true;
                         }
                     });
@@ -291,6 +298,20 @@ public class MapFragment extends Fragment {
                 Log.e("JSON Parsing", "Erreur lors de l'analyse JSON.");
             }
         }
+    private long getTimeSinceLastOpen(GeoPoint geopoint) {
+        if (markerTimestamps.containsKey(geopoint)) {
+            long lastTimestamp = markerTimestamps.get(geopoint);
+            long currentTime = System.currentTimeMillis();
+            return (currentTime - lastTimestamp) / 1000;
+        }
+        else {
+            return 120;
+        }
+    }
+
+    private void updateMarkerTimestamp(GeoPoint geopoint) {
+        markerTimestamps.put(geopoint, System.currentTimeMillis());
+    }
 
 
     public GeoPoint generateRandomLocation(GeoPoint playerLocation, double radius) {
