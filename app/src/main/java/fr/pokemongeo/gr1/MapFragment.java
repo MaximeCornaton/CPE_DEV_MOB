@@ -165,6 +165,45 @@ public class MapFragment extends Fragment {
             }.execute(); // Lancez la tâche AsyncTask.
         }
 
+        private void parseAndDisplayPokemonArenas(String overpassResponse) {
+            try {
+                JSONObject json = new JSONObject(overpassResponse);
+                JSONArray elements = json.getJSONArray("elements");
+
+                for (int i = 0; i < elements.length(); i++) {
+                    JSONObject element = elements.getJSONObject(i);
+                    double latitude = element.getDouble("lat");
+                    double longitude = element.getDouble("lon");
+
+                    // Create a marker for each Pokémon arena and add it to the map.
+                    GeoPoint arenaLocation = new GeoPoint(latitude, longitude);
+                    Marker arenaMarker = new Marker(binding.mapView);
+                    arenaMarker.setPosition(arenaLocation);
+                    arenaMarker.setIcon(getResources().getDrawable(R.drawable.arena));
+                    arenaMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker, MapView mapView) {
+                            // Handle interaction with the Pokémon arena.
+                            // You can trigger a battle or other actions here.
+                            ArenaFragment arenaFragment = new ArenaFragment();
+                            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            transaction.replace(R.id.fragment_container, arenaFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+                            return true;
+                        }
+                    });
+
+                    // Add the marker to the map.
+                    binding.mapView.getOverlays().add(arenaMarker);
+                }
+
+                binding.mapView.invalidate(); // Refresh the map to display the markers.
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("JSON Parsing", "Error parsing JSON.");
+            }
+        }
 
         private void parseAndDisplayWaterPoints(String overpassResponse) {
             try {
