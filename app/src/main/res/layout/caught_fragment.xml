@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data/>
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="#FF0000"
+        android:background="#FFFFFF"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
         <androidx.recyclerview.widget.RecyclerView
-            android:background="#00FF00"
+            android:background="#FFFFFF"
             android:id="@+id/caught_pokemon_list"
             android:layout_width="0dp"
             android:layout_height="0dp"

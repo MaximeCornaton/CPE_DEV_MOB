@@ -8,7 +8,7 @@
             type="fr.pokemongeo.gr1.PokemonViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="#FF00FF"
+        android:background="#FFFFFF"
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="50dp">
