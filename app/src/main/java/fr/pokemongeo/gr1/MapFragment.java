@@ -228,19 +228,31 @@ public class MapFragment extends Fragment {
                     double latitude = element.getDouble("lat");
                     double longitude = element.getDouble("lon");
 
+                    String arenaName = "";
+                    if (element.has("tags")) {
+                        JSONObject tags = element.getJSONObject("tags");
+                        if (tags.has("name")) {
+                            arenaName = tags.getString("name");
+                        }
+                    }
+
                     // Créer un marqueur pour chaque restaurant et l'ajouter à la carte.
                     GeoPoint waterPoint = new GeoPoint(latitude, longitude);
                     Marker waterMarker = new Marker(binding.mapView);
                     waterMarker.setPosition(waterPoint);
                     waterMarker.setIcon(getResources().getDrawable(R.drawable.arena));
+                    String finalArenaName = arenaName;
                     waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker, MapView mapView) {
-                            ArenaFragment arenaFragment = new ArenaFragment();
+                            ArenaFragment arenaFragment = new ArenaFragment(finalArenaName);
                             FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                             transaction.replace(R.id.fragment_container, arenaFragment);
                             transaction.addToBackStack(null);
                             transaction.commit();
+
+                            Database.getInstance(getContext()).insertArena(finalArenaName,  false);
+
                             return true;
                         }
                     });

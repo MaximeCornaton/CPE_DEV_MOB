@@ -15,8 +15,10 @@ import fr.pokemongeo.gr1.databinding.ArenaFragmentBinding;
 
 public class ArenaFragment extends Fragment {
     private ArenaFragmentBinding binding;
-    public ArenaFragment() {
-        // Required empty public constructor
+    private String arenaName;
+
+    public ArenaFragment(String arenaName) {
+        this.arenaName = arenaName;
     }
 
     @Override
@@ -25,22 +27,28 @@ public class ArenaFragment extends Fragment {
                 R.layout.arena_fragment, container, false);
         View rootView = binding.getRoot();
 
-
         MaterialButton backButtonMaterial = rootView.findViewById(R.id.backButton);
         MaterialButton captureButtonMaterial = rootView.findViewById(R.id.captureButton);
-        // Ajouter un listener de clic au bouton
+
         backButtonMaterial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Retourner au fragment précédent
+                // Return to the previous fragment
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                 fragmentManager.popBackStack();
             }
         });
+
         captureButtonMaterial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Retourner au fragment précédent
+                // Check if the arena is already captured
+                if (!isArenaCaptured(arenaName)) {
+                    // If not captured, update the capture status in the database
+                    updateCaptureStatusInDatabase(arenaName);
+                }
+
+                // Return to the previous fragment
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                 fragmentManager.popBackStack();
             }
@@ -49,5 +57,20 @@ public class ArenaFragment extends Fragment {
         return rootView;
     }
 
+    private boolean isArenaCaptured(String arenaName) {
+        // Implement the logic to check if the arena is already captured
+        // You can query the database or use any other method based on your implementation
+        // Replace the following line with your logic to check if the arena is captured
+        boolean isCaptured = Database.getInstance(requireContext()).isArenaCaptured(arenaName);
 
+        return isCaptured;
+    }
+
+    private void updateCaptureStatusInDatabase(String arenaName) {
+        // Assuming you have access to the arenaName and captured status
+        boolean captured = true; // Replace with the actual capture status
+
+        // Update the capture status in the database
+        Database.getInstance(requireContext()).updateCaptureStatus(arenaName, captured);
+    }
 }

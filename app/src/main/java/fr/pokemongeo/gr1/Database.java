@@ -136,4 +136,57 @@ public class Database {
         editor.apply();
     }
 
+    public void insertArena(String name, boolean isOwned) {
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("isOwned", isOwned ? 1 : 0);
+
+        insert("Arenas", null, values);
+    }
+
+    public boolean updateCaptureStatus(String arenaName, boolean captured) {
+        try {
+            // Assuming you have a column named "captured" in your "Arenas" table
+            ContentValues values = new ContentValues();
+            values.put("captured", captured ? 1 : 0);
+
+            // Update the row with the given arenaName
+            int rowsAffected = update("Arenas", values, "name=?", new String[]{arenaName});
+
+            // If rowsAffected is greater than 0, the update was successful
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            // Handle any exceptions, log, or show a toast if needed
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isArenaCaptured(String arenaName) {
+        try {
+            // Assuming you have a column named "captured" in your "Arenas" table
+            String[] columns = {"captured"};
+            String selection = "name=?";
+            String[] selectionArgs = {arenaName};
+
+            Cursor cursor = query("Arenas", columns, selection, selectionArgs, null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int capturedColumnIndex = cursor.getColumnIndex("captured");
+                int capturedValue = cursor.getInt(capturedColumnIndex);
+                cursor.close();
+
+                // Return true if the arena is captured (capturedValue is 1), otherwise false
+                return capturedValue == 1;
+            }
+        } catch (Exception e) {
+            // Handle any exceptions, log, or show a toast if needed
+            e.printStackTrace();
+        }
+
+        // Default to false if there's an error or the arena is not found
+        return false;
+    }
+
+
 }
