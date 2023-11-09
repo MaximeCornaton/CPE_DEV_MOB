@@ -114,7 +114,11 @@ public class MapFragment extends Fragment {
         binding.mapView.getController().setZoom(18);
     }
 
-        private void fetchPointsOfInterest(Location location) {
+    /**
+     * Récupère les points d'intérêt autour de la position donnée.
+     * @param location
+     */
+    private void fetchPointsOfInterest(Location location) {
             // AsyncTasks pour effectuer les requêtes Overpass de manière asynchrone.
             asyncTaskPokestops = new AsyncTask<Void, Void, String>() {
                 @Override
@@ -218,7 +222,11 @@ public class MapFragment extends Fragment {
             }.execute(); // Lancez la tâche AsyncTask.
         }
 
-        private void parseAndDisplayPokemonArenas(String overpassResponse) {
+    /**
+     * Analyse la réponse Overpass et affiche les arènes sur la carte.
+     * @param overpassResponse
+     */
+    private void parseAndDisplayPokemonArenas(String overpassResponse) {
             try {
                 JSONObject json = new JSONObject(overpassResponse);
                 JSONArray elements = json.getJSONArray("elements");
@@ -268,48 +276,58 @@ public class MapFragment extends Fragment {
             }
         }
 
-        private void parseAndDisplayWaterPoints(String overpassResponse) {
-            try {
-                JSONObject json = new JSONObject(overpassResponse);
-                JSONArray elements = json.getJSONArray("elements");
+    /**
+     * Analyse la réponse Overpass et affiche les pokestops sur la carte.
+     * @param overpassResponse
+     */
+    private void parseAndDisplayWaterPoints(String overpassResponse) {
+        try {
+            JSONObject json = new JSONObject(overpassResponse);
+            JSONArray elements = json.getJSONArray("elements");
 
-                for (int i = 0; i < elements.length(); i++) {
-                    JSONObject element = elements.getJSONObject(i);
-                    double latitude = element.getDouble("lat");
-                    double longitude = element.getDouble("lon");
+            for (int i = 0; i < elements.length(); i++) {
+                JSONObject element = elements.getJSONObject(i);
+                double latitude = element.getDouble("lat");
+                double longitude = element.getDouble("lon");
 
-                    // Créez un marqueur pour chaque point d'eau et ajoutez-le à la carte.
-                    GeoPoint waterPoint = new GeoPoint(latitude, longitude);
-                    Marker waterMarker = new Marker(binding.mapView);
-                    waterMarker.setPosition(waterPoint);
-                    waterMarker.setIcon(getResources().getDrawable(R.drawable.baseline_my_location_24));
-                    waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                        @Override
-                        public boolean onMarkerClick(Marker marker, MapView mapView) {
-                            if (getTimeSinceLastOpen(waterPoint) >= 120) {
-                                PokestopFragment pokestopFragment = new PokestopFragment();
-                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                                transaction.replace(R.id.fragment_container, pokestopFragment);
-                                transaction.addToBackStack(null);
-                                transaction.commit();
-                                updateMarkerTimestamp(waterPoint);
-                            } else {
-                                Toast.makeText(getContext(), "Come back in "+ (120 - getTimeSinceLastOpen(waterPoint)) +" seconds !", Toast.LENGTH_SHORT).show();
-                            }
-                            return true;
+                // Créez un marqueur pour chaque point d'eau et ajoutez-le à la carte.
+                GeoPoint waterPoint = new GeoPoint(latitude, longitude);
+                Marker waterMarker = new Marker(binding.mapView);
+                waterMarker.setPosition(waterPoint);
+                waterMarker.setIcon(getResources().getDrawable(R.drawable.baseline_my_location_24));
+                waterMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker, MapView mapView) {
+                        if (getTimeSinceLastOpen(waterPoint) >= 120) {
+                            PokestopFragment pokestopFragment = new PokestopFragment();
+                            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            transaction.replace(R.id.fragment_container, pokestopFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+                            updateMarkerTimestamp(waterPoint);
+                        } else {
+                            Toast.makeText(getContext(), "Come back in "+ (120 - getTimeSinceLastOpen(waterPoint)) +" seconds !", Toast.LENGTH_SHORT).show();
                         }
-                    });
+                        return true;
+                    }
+                });
 
-                    // Ajoutez le marqueur à la carte.
-                    binding.mapView.getOverlays().add(waterMarker);
-                }
-
-                binding.mapView.invalidate(); // Rafraîchissez la carte pour afficher les marqueurs.
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("JSON Parsing", "Erreur lors de l'analyse JSON.");
+                // Ajoutez le marqueur à la carte.
+                binding.mapView.getOverlays().add(waterMarker);
             }
+
+            binding.mapView.invalidate(); // Rafraîchissez la carte pour afficher les marqueurs.
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("JSON Parsing", "Erreur lors de l'analyse JSON.");
         }
+    }
+
+    /**
+     * Retourne le nombre de secondes écoulées depuis le dernier clic sur le marqueur.
+     * @param geopoint
+     * @return
+     */
     private long getTimeSinceLastOpen(GeoPoint geopoint) {
         if (markerTimestamps.containsKey(geopoint)) {
             long lastTimestamp = markerTimestamps.get(geopoint);
@@ -321,11 +339,20 @@ public class MapFragment extends Fragment {
         }
     }
 
+    /**
+     * Met à jour le timestamp du marqueur.
+     * @param geopoint
+     */
     private void updateMarkerTimestamp(GeoPoint geopoint) {
         markerTimestamps.put(geopoint, System.currentTimeMillis());
     }
 
-
+    /**
+     * Génère un emplacement aléatoire autour de la position donnée.
+     * @param playerLocation
+     * @param radius
+     * @return
+     */
     public GeoPoint generateRandomLocation(GeoPoint playerLocation, double radius) {
         // Conversion du rayon en degrés de latitude et longitude
         double latDegrees = Math.toDegrees(radius / 111319.9); // Environ 111,320 mètres par degré de latitude
@@ -336,6 +363,11 @@ public class MapFragment extends Fragment {
 
         return new GeoPoint(lat, lon);
     }
+
+    /**
+     * Génère un Pokémon aléatoire et l'ajoute à la carte.
+     * @param playerPosition
+     */
     public void spawnRandomPokemon(GeoPoint playerPosition) {
         // Génère un emplacement aléatoire autour du joueur
         GeoPoint randomLocation = generateRandomLocation(playerPosition, 1);
@@ -354,6 +386,10 @@ public class MapFragment extends Fragment {
         binding.mapView.invalidate();
     }
 
+    /**
+     * Sélectionne un Pokémon aléatoire dans la base de données.
+     * @return
+     */
     private Pokemon getRandomPokemonFromDatabase() {
         Database db = Database.getInstance(getContext());
 
@@ -462,6 +498,11 @@ public class MapFragment extends Fragment {
         binding.mapView.invalidate();
     }
 
+    /**
+     * Ajoute un listener au marqueur pour ouvrir le capture fragment.
+     * @param marker
+     * @param pokemon
+     */
     private void addListenerToMarker(Marker marker, Pokemon pokemon) {
         marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
             @Override

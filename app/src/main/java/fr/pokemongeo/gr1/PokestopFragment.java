@@ -53,6 +53,12 @@ public class PokestopFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Génère un nombre aléatoire d'items entre minCount et maxCount inclus
+     * @param minCount
+     * @param maxCount
+     * @return
+     */
     private List<Item> generateRandomItems(int minCount, int maxCount) {
         Random random = new Random();
         int itemCount = random.nextInt(maxCount - minCount + 1) + minCount; // Générer un nombre entre minCount et maxCount inclus
@@ -81,6 +87,10 @@ public class PokestopFragment extends Fragment {
         return items;
     }
 
+    /**
+     * Met à jour la base de données en ajoutant 1 à la quantité de l'item avec le nom donné
+     * @param name
+     */
     private void updateDatabase(String name) {
         Database db = Database.getInstance(getContext());
 
@@ -95,7 +105,11 @@ public class PokestopFragment extends Fragment {
         db.update("Items", values, whereClause, whereArgs);
     }
 
-    // Méthode pour obtenir la quantité actuelle d'un item
+    /**
+     * Obtient la quantité de l'item avec le nom donné
+     * @param name
+     * @return
+     */
     private int getItemQuantity(String name) {
         Database db = Database.getInstance(getContext());
         String[] columns = { "quantity" };

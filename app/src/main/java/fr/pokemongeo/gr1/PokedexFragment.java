@@ -54,6 +54,10 @@ public class PokedexFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Récupère tous les Pokémons de la base de données
+     * @return
+     */
     private List<Pokemon> getAllPokemonsFromDatabase() {
         List<Pokemon> pokemonList = new ArrayList<>();
         Database database = Database.getInstance(getContext());
