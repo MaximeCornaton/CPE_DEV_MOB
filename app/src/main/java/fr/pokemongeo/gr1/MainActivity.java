@@ -86,7 +86,10 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(welcomeFragment);
     }
 
-
+    /**
+     * Met à jour la valeur de la clé "firstLaunch" dans les SharedPreferences
+     * @param isFirstLaunch
+     */
     private void setFirstLaunch(boolean isFirstLaunch) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -94,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    /**
+     * Affiche le contenu principal de l'application
+     */
     public void showStartup() {
         // Initialisation de la barre de navigation
         bottomNavigationView = binding.navigation;
@@ -138,6 +144,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Remplace le fragment actuellement affiché par le fragment donné
+     * @param fragment
+     */
     private void replaceFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
@@ -145,7 +155,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Marque le starter sélectionné comme capturé dans la base de données
+     * @param starter
+     * @param context
+     */
     public void onPokemonSelected(String starter, Context context) {
         Database database = Database.getInstance(context);
         database.loadPokemonFromJSON(context);
@@ -176,6 +190,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Affiche une boîte de dialogue expliquant que la permission de localisation est requise
+     */
     private void showExplanationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Location required");
@@ -198,6 +215,9 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Configure le LocationManager pour recevoir des mises à jour de la position
+     */
     private void setupLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

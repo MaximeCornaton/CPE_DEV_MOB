@@ -127,6 +127,10 @@ public class CaptureFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Supprime le marqueur du Pokémon passé en paramètre de la carte
+     * @param pokemon
+     */
     private void removePokemonMarker(Pokemon pokemon) {
         // Restaure markerPokemonMap depuis les préférences partagées
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
@@ -156,13 +160,16 @@ public class CaptureFragment extends Fragment {
         }
     }
 
-
-
     private boolean attemptCapture(int i) {
         double random = Math.random() * 100;
         return random <= i;
     }
 
+    /**
+     * Capture le Pokémon
+     * @param ballType
+     * @param ballQuantity
+     */
     private void catchPokemon(String ballType, int ballQuantity) {
         // Décrémenter la quantité de Pokéballs dans la bdd
         ContentValues updateValues = new ContentValues();
@@ -183,6 +190,11 @@ public class CaptureFragment extends Fragment {
         getActivity().getSupportFragmentManager().popBackStack();
     }
 
+    /**
+     * Récupère la quantité de balls du type passé en paramètre
+     * @param ballType
+     * @return
+     */
     private int getBalls(String ballType) {
         // Vérifie si le joueur a au moins 1 Ball
         Database database = Database.getInstance(getContext());

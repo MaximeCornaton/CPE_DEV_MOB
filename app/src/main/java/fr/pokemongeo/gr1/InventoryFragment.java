@@ -39,6 +39,10 @@ public class InventoryFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Récupère tous les items depuis la base de données
+     * @return
+     */
     private List<Item> getAllItemsFromDatabase() {
         List<Item> itemList = new ArrayList<>();
         Database database = Database.getInstance(getContext());

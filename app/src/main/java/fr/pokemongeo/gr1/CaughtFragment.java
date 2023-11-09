@@ -49,6 +49,10 @@ public class CaughtFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Récupérez la liste des Pokémon capturés depuis la base de données
+     * @return
+     */
     private List<Pokemon> getAllCapturedPokemonsFromDatabase() {
         List<Pokemon> pokemonList = new ArrayList<>();
         Database database = Database.getInstance(getContext());

@@ -49,6 +49,10 @@ public class Database {
         return rowsUpdated;
     }
 
+    /**
+     * Charge les pokémons dans la base de données depuis le fichier JSON
+     * @param context
+     */
     public void loadPokemonFromJSON(Context context) {
         if (!hasDataLoaded(context)) {
             // Ouverture du fichier dans assets
@@ -105,6 +109,10 @@ public class Database {
         }
     }
 
+    /**
+     * Initialise les items dans la base de données
+     * @param context
+     */
     private void loadInventory(Context context) {
         createItem(context,"Potion","potion", "Donne 50PV supplémentaires à un pokémon", 0);
         createItem(context,"Super Potion","potion","Donne 100PV supplémentaires à un pokémon", 0);
@@ -124,11 +132,21 @@ public class Database {
         db.insert("Items", null, values);
     }
 
+    /**
+     * Vérifie si les données ont déjà été chargées
+     * @param context
+     * @return
+     */
     private boolean hasDataLoaded(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("dataLoaded", false);
     }
 
+    /**
+     * Enregistre que les données ont été chargées
+     * @param context
+     * @param loaded
+     */
     private void setHasDataLoaded(Context context, boolean loaded) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
