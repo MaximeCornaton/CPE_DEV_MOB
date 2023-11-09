@@ -1,6 +1,7 @@
 package fr.pokemongeo.gr1;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +63,7 @@ public class ArenaFragment extends Fragment {
         // You can query the database or use any other method based on your implementation
         // Replace the following line with your logic to check if the arena is captured
         boolean isCaptured = Database.getInstance(requireContext()).isArenaCaptured(arenaName);
-
+        Log.d("ArenaFragment", "isArenaCaptured: " + isCaptured);
         return isCaptured;
     }
 
